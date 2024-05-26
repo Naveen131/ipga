@@ -48,6 +48,7 @@ class LoginSerializer(serializers.ModelSerializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
+    title = serializers.CharField(required=True, error_messages={'required': 'Title is required'})
     first_name = serializers.CharField(required=True,
                                        error_messages={'required': 'First Name is required'})
     last_name = serializers.CharField(required=True,
@@ -68,26 +69,22 @@ class UserProfileSerializer(serializers.ModelSerializer):
     aadhar_file = CustomBase64FileField(required=False)
     passport_number = serializers.CharField(required=False)
     passport_file = CustomBase64FileField(required=False)
-    city = serializers.PrimaryKeyRelatedField(queryset=City.objects.all(),required=True,
-                                              error_messages={'required': 'City is required'})
-    state = serializers.PrimaryKeyRelatedField(queryset=State.objects.all(),required=True,
-                                               error_messages={'required': 'State is required'})
-    country = serializers.PrimaryKeyRelatedField(queryset=Country.objects.all(),required=True,
-                                                 error_messages={'required': 'Country is required'})
-    pincode = serializers.CharField(required=True, error_messages={'required': 'Pincode is required'})
-    business_number = serializers.CharField(required=True,
-                                            error_messages={'required': 'Business Number is required'})
-    direct_number = serializers.CharField(required=True,
-                                          error_messages={'required': 'Direct Number is required'})
+    city = serializers.CharField(required=False)
+    state = serializers.CharField(required=False)
+    country = serializers.PrimaryKeyRelatedField(queryset=Country.objects.all(),required=True, error_messages={'required': 'Country is required'})
+    pincode = serializers.CharField(required=False)
+    business_number = serializers.CharField(required=False)
+    direct_number = serializers.CharField(required=False)
+
 
     class Meta:
         model = UserProfile
-        fields = ('first_name', 'last_name', 'mobile_number', 'gender', 'organization', 'designation',
+        fields = ('title', 'first_name', 'last_name', 'mobile_number', 'gender', 'organization', 'designation',
                   'gst_number', 'gst_file', 'aadhar_number', 'aadhar_file', 'passport_number', 'passport_file',
                   'city', 'state', 'country', 'pincode', 'business_number', 'direct_number')
 
     def create(self, validated_data):
-
+        # import pdb;pdb.set_trace()
         user = self.context['request'].user
         # profile data
         profile_data = dict(
@@ -107,17 +104,16 @@ class UserProfileSerializer(serializers.ModelSerializer):
         user_profile = UserProfile.objects.create(**profile_data)
 
         # address object
-        pincode = validated_data.pop('pincode')
-        pincode = Pincode.objects.get_or_create(pincode=pincode)
-        if pincode:
-            pincode = pincode[0]
+        # pincode = Pincode.objects.get_or_create(pincode=pincode)
+        # if pincode:
+        #     pincode = pincode[0]
 
         address_data = dict(
             user=user,
             city=validated_data.pop('city'),
             state=validated_data.pop('state'),
             country=validated_data.pop('country'),
-            pincode=pincode,
+            pincode=validated_data.pop('pincode'),
         )
 
         # create address

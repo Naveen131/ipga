@@ -46,6 +46,16 @@ class User(AbstractUser, PermissionsMixin):
         ('Female', 'Female')
     )
 
+    TITLE = (
+        ('Mr', 'Mr'),
+        ('Mrs', 'Mrs'),
+        ('Ms', 'Ms'),
+        ('Dr', 'Dr'),
+        ('Prof', 'Prof'),
+        ('Rev', 'Rev'),
+        ('Other', 'Other')
+    )
+    title = models.CharField(max_length=255, null=True, blank=True, choices=TITLE)
     first_name = models.CharField(max_length=255, null=True, blank=True)
     last_name = models.CharField(max_length=255, null=True, blank=True)
     email = models.EmailField(unique=True, null=True, blank=True)
@@ -117,9 +127,9 @@ class Pincode(models.Model):
 class Address(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     address = models.TextField()
-    city = models.ForeignKey(City, on_delete=models.CASCADE, null=True, blank=True)
-    state = models.ForeignKey(State, on_delete=models.CASCADE, null=True, blank=True)
-    pincode = models.ForeignKey(Pincode, on_delete=models.CASCADE, null=True, blank=True)
+    city = models.CharField(max_length=255, null=True, blank=True)
+    state = models.CharField(max_length=255, null=True, blank=True)
+    pincode = models.CharField(max_length=10, null=True, blank=True)
     country = models.ForeignKey(Country, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
