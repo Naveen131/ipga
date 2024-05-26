@@ -2,6 +2,9 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser, PermissionsMixin
 from django.db import models
 
+from ipgaevent.storage_backends import PublicMediaStorage
+
+
 # Create your models here.
 
 
@@ -46,7 +49,7 @@ class User(AbstractUser, PermissionsMixin):
     first_name = models.CharField(max_length=255, null=True, blank=True)
     last_name = models.CharField(max_length=255, null=True, blank=True)
     email = models.EmailField(unique=True, null=True, blank=True)
-    mobile_number = models.CharField(max_length=10, unique=True)
+    mobile_number = models.CharField(max_length=10, unique=True, null=True, blank=True)
     name = models.CharField(max_length=255, null=True, blank=True)
     unique_id = models.CharField(max_length=255, unique=True, null=True, blank=True)
     designation = models.CharField(max_length=255, null=True, blank=True)
@@ -75,11 +78,13 @@ class UserProfile(models.Model):
     )
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     gst_number = models.CharField(max_length=255, null=True, blank=True)
-    gst_file = models.FileField(upload_to='gst_files/', null=True, blank=True)
+    gst_file = models.FileField(storage=PublicMediaStorage(), upload_to='gst_files/', null=True, blank=True)
     passport_number = models.CharField(max_length=255, null=True, blank=True)
-    passport_file = models.FileField(upload_to='passport_files/', null=True, blank=True)
+    passport_file = models.FileField(storage=PublicMediaStorage(),upload_to='passport_files/', null=True, blank=True)
     aadhar_number = models.CharField(max_length=255, null=True, blank=True)
-    aadhar_file = models.FileField(upload_to='aadhar_files/', null=True, blank=True)
+    aadhar_file = models.FileField(storage=PublicMediaStorage(),upload_to='aadhar_files/', null=True, blank=True)
+    business_number = models.CharField(max_length=12, null=True, blank=True)
+    direct_number = models.CharField(max_length=12, null=True, blank=True)
 
 
 class City(models.Model):
@@ -118,4 +123,4 @@ class Address(models.Model):
     country = models.ForeignKey(Country, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
-        return self.address
+        return self.user.email if self.user.email else "Undefined Address"
