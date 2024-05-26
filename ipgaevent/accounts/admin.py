@@ -40,6 +40,11 @@ class PincodeAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     list_filter = ['pincode']
 
 
+class MembershipAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+    list_display = ['code']
+    search_fields = ['code']
+
+
 # Register your models here.
 admin.site.register(User, UserAdmin)
 admin.site.register(UserProfile, UserProfileAdmin)

@@ -124,3 +124,12 @@ class Address(models.Model):
 
     def __str__(self):
         return self.user.email if self.user.email else "Undefined Address"
+
+
+class Membership(models.Model):
+    code = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.code
+
+
