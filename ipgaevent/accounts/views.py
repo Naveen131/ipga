@@ -4,7 +4,7 @@ from rest_framework.generics import CreateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from accounts.models import User, State, City, Country
+from accounts.models import User, State, City, Country, Membership
 from accounts.serializers import SignUpSerializer, LoginSerializer, UserProfileSerializer, StateSerializer, \
     CitySerializer, CountrySerializer
 from utils.utils import APIResponse
@@ -87,7 +87,7 @@ class StateListView(ListAPIViewWithPagination):
     serializer_class = StateSerializer
 
     def get_queryset(self):
-        queryset = self.queryset
+        queryset = State.objects.all()
         if self.request.query_params.get('search'):
             queryset = queryset.filter(name__istartswith=self.request.query_params.get('search'))
         return queryset
@@ -98,7 +98,7 @@ class CityListView(ListAPIViewWithPagination):
     serializer_class = CitySerializer
 
     def get_queryset(self):
-        queryset = self.queryset
+        queryset = City.objects.all()
         if self.request.query_params.get('search'):
             queryset = queryset.filter(name__istartswith=self.request.query_params.get('search'))
         return queryset
@@ -109,8 +109,34 @@ class CountryListView(ListAPIViewWithPagination):
     serializer_class = CountrySerializer
 
     def get_queryset(self):
-        queryset = self.queryset
+        queryset = Country.objects.all()
         if self.request.query_params.get('search'):
             queryset = queryset.filter(name__istartswith=self.request.query_params.get('search'))
         return queryset
+
+
+class CheckMembership(CreateAPIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        data = request.data
+        code = data.get('code')
+
+        try:
+            membership = Membership.objects.filter(code=code)
+            if membership.exists():
+               data = {
+                    'is_membership': True
+                }
+            else:
+                data = {
+                    'is_membership': False
+                }
+            return APIResponse(data=data, status_code=200, message="Membership code applied successfully")
+
+        except Exception as e:
+
+            return APIResponse(data=data, status_code=400, message=str(e))
+
 
