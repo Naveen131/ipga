@@ -7,6 +7,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from accounts.models import User, State, City, Country, Membership
 from accounts.serializers import SignUpSerializer, LoginSerializer, UserProfileSerializer, StateSerializer, \
     CitySerializer, CountrySerializer
+from ipgaevent import settings
 from utils.utils import APIResponse
 from utils.views import ListAPIViewWithPagination
 
@@ -140,3 +141,8 @@ class CheckMembership(CreateAPIView):
             return APIResponse(data=data, status_code=400, message=str(e))
 
 
+def send_email(request):
+    # import pdb;pdb.set_trace()
+    subject = 'Thank you for registering to our site'
+    message = ' it  means a world to us '
+    email_from = settings.EMAIL_HOST_USER
