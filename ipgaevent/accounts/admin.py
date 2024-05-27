@@ -1,7 +1,7 @@
 from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
 
-from accounts.models import User, UserProfile, City, State, Country, Pincode, Address
+from accounts.models import User, UserProfile, City, State, Country, Pincode, Address, Membership
 
 
 class UserAdmin(ImportExportModelAdmin,admin.ModelAdmin):
@@ -53,3 +53,4 @@ admin.site.register(State, StateAdmin)
 admin.site.register(Country, CountryAdmin)
 admin.site.register(Pincode, PincodeAdmin)
 admin.site.register(Address)
+admin.site.register(Membership, MembershipAdmin)

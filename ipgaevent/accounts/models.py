@@ -125,12 +125,19 @@ class Pincode(models.Model):
 
 
 class Address(models.Model):
+    ADDRESS_TYPE = (
+        ('Billing', 'Billing'),
+        ('Shipping', 'Shipping'),
+        ('Other', 'Other')
+    )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     address = models.TextField()
     city = models.CharField(max_length=255, null=True, blank=True)
     state = models.CharField(max_length=255, null=True, blank=True)
     pincode = models.CharField(max_length=10, null=True, blank=True)
     country = models.ForeignKey(Country, on_delete=models.CASCADE, null=True, blank=True)
+    address_type = models.CharField(max_length=255, choices=ADDRESS_TYPE, default='Other')
+    is_default = models.BooleanField(default=False)
 
     def __str__(self):
         return self.user.email if self.user.email else "Undefined Address"
