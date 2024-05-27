@@ -73,14 +73,15 @@ class UserProfileSerializer(serializers.ModelSerializer):
     state = serializers.CharField(required=False)
     country = serializers.PrimaryKeyRelatedField(queryset=Country.objects.all(),required=True, error_messages={'required': 'Country is required'})
     pincode = serializers.CharField(required=False)
+    address = serializers.CharField(required=False)
     business_number = serializers.CharField(required=False)
     direct_number = serializers.CharField(required=False)
 
     primary_address = serializers.CharField(required=False)
     primary_state = serializers.CharField(required=False)
     primary_city = serializers.CharField(required=False)
-    primary_country = serializers.PrimaryKeyRelatedField(queryset=Country.objects.all(),required=False, error_messages={'required': 'Country is required'})
     primary_pincode = serializers.CharField(required=False)
+    primary_address = serializers.CharField(required=False)
     is_default_address = serializers.BooleanField(required=False)
 
     class Meta:
@@ -88,7 +89,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         fields = ('title', 'first_name', 'last_name', 'mobile_number', 'gender', 'organization', 'designation',
                   'gst_number', 'gst_file', 'aadhar_number', 'aadhar_file', 'passport_number', 'passport_file',
                   'city', 'state', 'country', 'pincode', 'business_number', 'direct_number', 'primary_address',
-                  'primary_state', 'primary_city', 'primary_country', 'primary_pincode', 'is_default_address')
+                  'primary_state', 'primary_city', 'primary_pincode', 'is_default_address','address')
 
     def create(self, validated_data):
         # import pdb;pdb.set_trace()
@@ -115,14 +116,16 @@ class UserProfileSerializer(serializers.ModelSerializer):
         # pincode = Pincode.objects.get_or_create(pincode=pincode)
         # if pincode:
         #     pincode = pincode[0]
+        country = validated_data.pop('country', None)
 
         address_data = dict(
             user=user,
             city=validated_data.pop('city'),
             state=validated_data.pop('state'),
-            country=validated_data.pop('country'),
+            country=country,
             pincode=validated_data.pop('pincode'),
             address_type='Billing',
+            address = validated_data.pop('address'),
             is_default=is_default_address,
 
         )
@@ -136,8 +139,9 @@ class UserProfileSerializer(serializers.ModelSerializer):
                 user=user,
                 city=validated_data.pop('primary_city', None),
                 state=validated_data.pop('primary_state', None),
-                country=validated_data.pop('primary_country', None),
+                country=country,
                 pincode=validated_data.pop('primary_pincode', None),
+                address=validated_data.pop('primary_address', None),
                 address_type='Shipping'
             )
 
