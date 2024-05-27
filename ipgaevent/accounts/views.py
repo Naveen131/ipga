@@ -21,7 +21,7 @@ class SignupAPIView(CreateAPIView):
         serializer = SignUpSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return APIResponse(data=serializer.data, status_code=200, message="User created successfully")
+        return APIResponse(data=serializer.data, status_code=200, message="User created successfully, Please login to continue")
 
 class LoginAPIView(CreateAPIView):
     permission_classes = (AllowAny,)
@@ -130,11 +130,13 @@ class CheckMembership(CreateAPIView):
                data = {
                     'is_membership': True
                 }
+               return APIResponse(data=data, status_code=200, message="Membership code applied successfully")
             else:
                 data = {
                     'is_membership': False
                 }
-            return APIResponse(data=data, status_code=200, message="Membership code applied successfully")
+                return APIResponse(data=data, status_code=200, message="Membership code Invalid")
+
 
         except Exception as e:
 
