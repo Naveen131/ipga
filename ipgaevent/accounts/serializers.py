@@ -76,16 +76,24 @@ class UserProfileSerializer(serializers.ModelSerializer):
     business_number = serializers.CharField(required=False)
     direct_number = serializers.CharField(required=False)
 
+    primary_address = serializers.CharField(required=False)
+    primary_state = serializers.CharField(required=False)
+    primary_city = serializers.CharField(required=False)
+    primary_country = serializers.PrimaryKeyRelatedField(queryset=Country.objects.all(),required=False, error_messages={'required': 'Country is required'})
+    primary_pincode = serializers.CharField(required=False)
+    is_default_address = serializers.BooleanField(required=False)
 
     class Meta:
         model = UserProfile
         fields = ('title', 'first_name', 'last_name', 'mobile_number', 'gender', 'organization', 'designation',
                   'gst_number', 'gst_file', 'aadhar_number', 'aadhar_file', 'passport_number', 'passport_file',
-                  'city', 'state', 'country', 'pincode', 'business_number', 'direct_number')
+                  'city', 'state', 'country', 'pincode', 'business_number', 'direct_number', 'primary_address',
+                  'primary_state', 'primary_city', 'primary_country', 'primary_pincode', 'is_default_address')
 
     def create(self, validated_data):
         # import pdb;pdb.set_trace()
         user = self.context['request'].user
+        is_default_address = validated_data.pop('is_default_address', False)
         # profile data
         profile_data = dict(
 
@@ -114,10 +122,29 @@ class UserProfileSerializer(serializers.ModelSerializer):
             state=validated_data.pop('state'),
             country=validated_data.pop('country'),
             pincode=validated_data.pop('pincode'),
+            address_type='Billing',
+            is_default=is_default_address,
+
         )
 
         # create address
         address = Address.objects.create(**address_data)
+
+        # primary address object
+        if not is_default_address:
+            primary_address_data = dict(
+                user=user,
+                city=validated_data.pop('primary_city', None),
+                state=validated_data.pop('primary_state', None),
+                country=validated_data.pop('primary_country', None),
+                pincode=validated_data.pop('primary_pincode', None),
+                address_type='Shipping'
+            )
+
+            # create primary address
+            primary_address = Address.objects.create(**primary_address_data)
+
+
 
         # update user data
         for key, value in validated_data.items():
