@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from accounts.models import User, UserProfile, City, State, Country, Pincode, Address
+from accounts.models import User, UserProfile, City, State, Country, Pincode, Address, Payment
 from utils.utils import CustomBase64FileField
 
 
@@ -19,6 +19,7 @@ class SignUpSerializer(serializers.ModelSerializer):
 
         )
         user.set_password(validated_data['password'])
+        user.reg_id = f"BDS2024{user.id}"
         user.save()
         return user
 
@@ -176,4 +177,14 @@ class CountrySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class PaymentTransferSerializer(serializers.Serializer):
+    amount = serializers.DecimalField(max_digits=10, decimal_places=2, required=True)
+
+    class Meta:
+        fields = ('amount',)
+
+    def create(self, validated_data):
+        user = self.context['request'].user
+        instance = Payment.objects.create(amount=validated_data.get('amount'), user=user)
+        return instance
 

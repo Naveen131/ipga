@@ -68,6 +68,7 @@ class User(AbstractUser, PermissionsMixin):
     user_type = models.CharField(max_length=255, choices=USER_TYPE, default='Internal')
     organization_name = models.CharField(max_length=255, null=True, blank=True)
     nationality = models.ForeignKey(Nationality, on_delete=models.CASCADE, null=True, blank=True)
+    reg_id = models.CharField(max_length=255, null=True, blank=True)
     password = models.CharField(max_length=255)
     objects = CustomUserManager()
 
@@ -76,6 +77,8 @@ class User(AbstractUser, PermissionsMixin):
 
     def __str__(self):
         return self.email if self.email else "Undefined User"
+
+
 
 
 class UserProfile(models.Model):
@@ -150,3 +153,28 @@ class Membership(models.Model):
         return self.code
 
 
+class Payment(models.Model):
+    PAYMENT_MODE = (
+        ('Cash', 'Cash'),
+        ('Card', 'Card'),
+        ('Net Banking', 'Net Banking'),
+        ('UPI', 'UPI'),
+    )
+
+    STATUS = (
+        ('Pending', 'Pending'),
+        ('Success', 'Success'),
+        ('Failed', 'Failed'),
+        ('Paid', 'Paid'),
+        ('Partial', 'Partial'),
+    )
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
+    amount_paid = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
+    payment_mode = models.CharField(max_length=255, choices=PAYMENT_MODE, default='Net Banking')
+    payment_date = models.DateTimeField(null=True, blank=True)
+    reference_id = models.CharField(max_length=255, null=True, blank=True)
+    status = models.CharField(max_length=255, choices=STATUS)
+
+    def __str__(self):
+        return self.user.email if self.user.email else "Undefined Payment"

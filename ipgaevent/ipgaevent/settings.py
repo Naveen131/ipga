@@ -248,3 +248,26 @@ SIMPLE_JWT = {
 # EMAIL_USE_TLS = True
 # EMAIL_HOST_USER = env("EMAIL_HOST_USER")
 # EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_HOST_USER = 'naveen.c131@gmail.com'
+# # DEFAULT_FROM_EMAIL = 'contacts@anrevents.in'
+# EMAIL_HOST_PASSWORD = 'Jiittemp131'
+# EMAIL_PORT = 587
+# EMAIL_USE_SSL = False
+# EMAIL_USE_TLS = True
+
+# import requests
+#
+# url = "https://api.zeptomail.in/v1.1/email"
+#
+# payload = "{\n\"from\": { \"address\": \"contact@anrevents.in\"},\n\"to\": [{\"email_address\": {\"address\": \"naveen.c131@gmail.com\",\"name\": \"Naveen Chaudhary\"}}],\n\"subject\":\"Test Email\",\n\"htmlbody\":\"<div><b> Test email sent successfully.  </b></div>\"\n}"
+# headers = {
+# 'accept': "application/json",
+# 'content-type': "application/json",
+# 'authorization': "Zoho-enczapikey PHtE6r1fQem4jTYsoxED4PXuRJKhMtgsruMyKFJPuI5KCfJVTk0Gq9x/x2K++U17VPMTHPKay4lo5LrPsbnWIW3qZ21PCWqyqK3sx/VYSPOZsbq6x00et1QSdEbZXIbsdddr1iTUstbTNA==",
+# }
+#
+# response = requests.request("POST", url, data=payload, headers=headers)
+#
+# print(response.text)

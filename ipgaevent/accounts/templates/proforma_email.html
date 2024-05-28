@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proforma Invoice</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .header, .footer {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .details-table, .amount-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .details-table th, .details-table td,
+        .amount-table th, .amount-table td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+        .details-table th, .amount-table th {
+            background-color: #f2f2f2;
+        }
+        .amount-table {
+            margin-top: 20px;
+        }
+        .total {
+            text-align: right;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>PROFORMA INVOICE</h1>
+    </div>
+
+    <div class="invoice-details">
+        <p><strong>GSTN:</strong> {{ gstn }}</p>
+        <p><strong>INDIA PULSES AND GRAINS ASSOCIATION</strong></p>
+        <p>Unit 106, T. V. Industrial Estate S. K. Ahire Marg, Worli Mumbai Maharashtra 400030 India</p>
+    </div>
+
+    <div class="customer-details">
+        <p><strong>To:</strong> {{ customer_name }}</p>
+        <p>{{ customer_address }}</p>
+        <p><strong>GSTN:</strong> {{ customer_gstn }}</p>
+    </div>
+
+    <div class="event-details">
+        <h2>THE PULSES CONCLAVE 2023</h2>
+    </div>
+
+    <div class="group-name">
+        <h3>Group Name</h3>
+    </div>
+
+    <table class="details-table">
+        <tr>
+            <th>Details</th>
+            <td>Registration</td>
+        </tr>
+        <tr>
+            <th>Delegate</th>
+            <td>{{ delegate_type }}</td>
+        </tr>
+        <tr>
+            <th>GST Amount</th>
+            <td>{{ gst_amount }}</td>
+        </tr>
+        <tr>
+            <th>Qty</th>
+            <td>{{ qty }}</td>
+        </tr>
+    </table>
+
+    <table class="amount-table">
+        <tr>
+            <th>Amount (INR)</th>
+            <td>{{ amount }}</td>
+        </tr>
+        <tr>
+            <th>GST Amount (INR)</th>
+            <td>{{ gst_amount }}</td>
+        </tr>
+        <tr class="total">
+            <th>TOTAL OWING (INR)</th>
+            <td>{{ total_owing }}</td>
+        </tr>
+    </table>
+
+    <div class="sac-code">
+        <p><strong>SAC Code:</strong> REGISTRATION: 998596 ACCOMMODATION: 998596</p>
+    </div>
+
+    <div class="footer">
+        <p>This is a computer generated document and does not require a signature</p>
+    </div>
+</div>
+
+</body>
+</html>
