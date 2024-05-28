@@ -83,6 +83,7 @@ class UserDetailsAPIView(CreateAPIView):
 
         except Exception as e:
             transaction.savepoint_rollback(sid)
+            print(e, "====================================")
             return APIResponse(data=None, status_code=400, message="Error in updating user details")
 
 
