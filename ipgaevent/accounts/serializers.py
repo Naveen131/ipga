@@ -179,12 +179,14 @@ class CountrySerializer(serializers.ModelSerializer):
 
 class PaymentTransferSerializer(serializers.Serializer):
     amount = serializers.DecimalField(max_digits=10, decimal_places=2, required=True)
+    tax = serializers.DecimalField(max_digits=10, decimal_places=2, required=True)
 
     class Meta:
+        model = Payment
         fields = ('amount',)
 
     def create(self, validated_data):
         user = self.context['request'].user
-        instance = Payment.objects.create(amount=validated_data.get('amount'), user=user)
+        instance = Payment.objects.create(amount=validated_data.get('amount'), tax=validated_data.get('tax'), user=user)
         return instance
 

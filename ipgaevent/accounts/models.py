@@ -59,7 +59,7 @@ class User(AbstractUser, PermissionsMixin):
     first_name = models.CharField(max_length=255, null=True, blank=True)
     last_name = models.CharField(max_length=255, null=True, blank=True)
     email = models.EmailField(unique=True, null=True, blank=True)
-    mobile_number = models.CharField(max_length=10, unique=True, null=True, blank=True)
+    mobile_number = models.CharField(max_length=20, unique=True, null=True, blank=True)
     name = models.CharField(max_length=255, null=True, blank=True)
     unique_id = models.CharField(max_length=255, unique=True, null=True, blank=True)
     designation = models.CharField(max_length=255, null=True, blank=True)
@@ -96,8 +96,8 @@ class UserProfile(models.Model):
     passport_file = models.FileField(storage=PublicMediaStorage(),upload_to='passport_files/', null=True, blank=True)
     aadhar_number = models.CharField(max_length=255, null=True, blank=True)
     aadhar_file = models.FileField(storage=PublicMediaStorage(),upload_to='aadhar_files/', null=True, blank=True)
-    business_number = models.CharField(max_length=12, null=True, blank=True)
-    direct_number = models.CharField(max_length=12, null=True, blank=True)
+    business_number = models.CharField(max_length=20, null=True, blank=True)
+    direct_number = models.CharField(max_length=20, null=True, blank=True)
 
 
 class City(models.Model):
@@ -171,6 +171,7 @@ class Payment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
     amount_paid = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
+    tax = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
     payment_mode = models.CharField(max_length=255, choices=PAYMENT_MODE, default='Net Banking')
     payment_date = models.DateTimeField(null=True, blank=True)
     reference_id = models.CharField(max_length=255, null=True, blank=True)
