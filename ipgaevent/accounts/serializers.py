@@ -187,6 +187,9 @@ class PaymentTransferSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         user = self.context['request'].user
-        instance = Payment.objects.create(amount=validated_data.get('amount'), tax=validated_data.get('tax'), user=user)
+        amount = validated_data.get('amount')
+        tax = validated_data.get('tax')
+        amount = amount - tax
+        instance = Payment.objects.create(amount=amount, tax=tax, user=user)
         return instance
 
