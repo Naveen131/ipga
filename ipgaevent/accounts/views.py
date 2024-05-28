@@ -1,4 +1,5 @@
 import base64
+import tempfile
 
 from django.db import transaction
 from django.shortcuts import render
@@ -196,7 +197,7 @@ import io
 
 def send_zeptomail_email(to_address, to_name, subject, html_body, attachments=None):
     url = "https://api.zeptomail.in/v1.1/email"
-
+    print(attachments)
     payload = {
         "from": {"address": "contact@anrevents.in"},
         "to": [{"email_address": {"address": to_address, "name": to_name}}],
@@ -205,14 +206,14 @@ def send_zeptomail_email(to_address, to_name, subject, html_body, attachments=No
     }
 
     if attachments:
-        payload["attachments"] = []
-        for attachment in attachments:
-            with open(attachment, "rb") as file:
-                content = base64.b64encode(file.read()).decode("utf-8")
-            payload["attachments"].append({
-                "content": content,
-                "filename": attachment.split("/")[-1]  # Extracting filename from path
-            })
+        payload["attachments"] = attachments
+        # for attachment in attachments:
+        #     with open(attachment, "rb") as file:
+        #         content = base64.b64encode(file.read()).decode("utf-8")
+        #     payload["attachments"].append({
+        #         "content": content,
+        #         "filename": attachment.split("/")[-1]  # Extracting filename from path
+        #     })
 
     headers = {
         'accept': "application/json",
@@ -390,24 +391,44 @@ def send_registration_confirmation_email(user, payment):
     html_body = html_body.replace('{{Currency}}', currency)
     html_body = html_body.replace('{{ Amountrequired }}', str(amount))
     html_body = html_body.replace('{{ Payment Status }}', 'Not paid')
+    address = Address.objects.filter(user=user).first()
+    # payment = Payment.objects.filter(user=user).first()
+    # import pdb;pdb.set_trace()
 
     context = {
-        'gstn': '27AACCI6531P1Z5',
-        'customer_name': 'Test, Mr Onsite Smt',
-        'customer_address': 'Jhjhjhjhj, Kmm Kjkk, India, 78787',
-        'customer_gstn': '',
-        'delegate_type': 'EB INDIAN SPOUSE',
-        'gst_amount': '7200',
+
+        'customer_name': user.first_name + ' ' + user.last_name,
+        'customer_address': address.address + ' ' + address.city + ', ' + address.state + ', ' + address.country.name,
+
+        'delegate_type': 'Delegate',
+        'gst_amount': currency + ' ' + str(payment.tax),
         'qty': '1',
-        'amount': '35400.00',
-        'total_owing': '47,200.00'
+        'amount': currency + ' ' + str(amount),
+        'total_owing': currency + ' ' + str(payment.amount+payment.tax)
     }
 
-    # html_string = render_to_string('proforma_email.html', context)
-    # html = HTML(string=html_string)
-    # pdf_file = html.write_pdf()
+    html_string = render_to_string('proforma_email.html', context)
+    html = HTML(string=html_string)
+    pdf_file = html.write_pdf()
 
-    send_zeptomail_email(to_address, to_name, subject, html_body, attachments=None)
+    with tempfile.NamedTemporaryFile(delete=False, suffix='.pdf') as temp_pdf_file:
+        temp_pdf_file.write(pdf_file)
+        temp_pdf_file_path = temp_pdf_file.name
+
+        # Attach PDF to the email
+    with open(temp_pdf_file_path, "rb") as file:
+        pdf_content_base64 = base64.b64encode(file.read()).decode("utf-8")
+
+    # Prepare attachment payload
+    attachments = [{
+        "content": pdf_content_base64,
+        "mime_type": "application/pdf",
+        "name": "proforma_invoice.pdf"
+    }]
+    # Attach PDF to the email
+    # attachments = ('proforma_invoice.pdf', pdf_file, 'application/pdf')
+
+    send_zeptomail_email(to_address, to_name, subject, html_body, attachments=attachments)
 
 
 # Call the function to send the email
