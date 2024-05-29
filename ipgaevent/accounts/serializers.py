@@ -63,7 +63,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     designation = serializers.CharField(required=True,
                                         error_messages={'required': 'Designation is required'})
 
-    gst_number = serializers.CharField(required=False)
+    gst_number = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     gst_file = CustomBase64FileField(required=False)
     aadhar_number = serializers.CharField(required=False)
 
