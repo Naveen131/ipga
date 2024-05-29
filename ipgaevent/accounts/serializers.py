@@ -94,6 +94,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         # import pdb;pdb.set_trace()
+        validated_data['organization_name'] = validated_data.pop('organization')
         user = self.context['request'].user
         is_default_address = validated_data.pop('is_default_address', False)
         # profile data
