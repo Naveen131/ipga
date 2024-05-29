@@ -271,3 +271,10 @@ SIMPLE_JWT = {
 # response = requests.request("POST", url, data=payload, headers=headers)
 #
 # print(response.text)
+
+
+MERCHANT_ID=1615307
+ACCESS_CODE='AVNK89LE46CE68KNEC'
+WORKING_KEY='2CFAD1965AE56F0B6F2C0B35583BCBBB',
+REDIRECT_URL= 'https://anrevents.in',
+CANCEL_URL='https://anrevents.in'

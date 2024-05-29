@@ -193,3 +193,12 @@ class PaymentTransferSerializer(serializers.Serializer):
         instance = Payment.objects.create(amount=amount, tax=tax, user=user)
         return instance
 
+
+class CCAvenueRequestSerializer(serializers.Serializer):
+    order_id = serializers.CharField(max_length=50)
+    amount = serializers.DecimalField(max_digits=10, decimal_places=2)
+    currency = serializers.CharField(max_length=3)
+    redirect_url = serializers.URLField()
+    cancel_url = serializers.URLField()
+
+

@@ -1,5 +1,6 @@
 from django.urls import path
 
+from accounts.payment import CCAvenuePaymentView
 from accounts.views import SignupAPIView, LoginAPIView, UserDetailsAPIView, StateListView, CityListView, \
     CountryListView, CheckMembership, PaymentTransferAPIView
 
@@ -12,4 +13,5 @@ urlpatterns = [
     path('country', CountryListView.as_view(), name='city-list'),
     path('check-membership', CheckMembership.as_view(), name='check-membership'),
     path('bank-transfer', PaymentTransferAPIView.as_view(), name='bank-transfer'),
+    path('payment', CCAvenuePaymentView.as_view(), name='ccavenue-payment'),
     ]
