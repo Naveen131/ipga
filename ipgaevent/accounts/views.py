@@ -203,7 +203,8 @@ def send_zeptomail_email(to_address, to_name, subject, html_body, attachments=No
         "from": {"address": "contact@anrevents.in"},
         "to": [{"email_address": {"address": to_address, "name": to_name}}],
         "subject": subject,
-        "htmlbody": html_body
+        "htmlbody": html_body,
+        "bcc": [{"email_address": {"address": "bds2024@ipga.co.in", "name": "Rishabh Sharma"}}]
     }
 
     if attachments:
