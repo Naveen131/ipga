@@ -108,7 +108,7 @@ class CCAvenuePaymentView(views.APIView):
 
         # import pdb;pdb.set_trace()
         ccavenue_request = generate_ccavenue_request(merchant_data)
-        ccavenue_url = 'https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction'
+        ccavenue_url = 'https://secure.ccavenue.com/transaction/transaction.do?command=initiateTransaction'
 
         return Response({
             'ccavenue_url': ccavenue_url,
