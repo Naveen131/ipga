@@ -1,6 +1,4 @@
 import base64
-import hashlib
-from binascii import hexlify
 from hashlib import md5
 # import md5
 import requests
@@ -30,17 +28,15 @@ def pad(data):
 	data += chr(length)*length
 	return data
 
-def encrypt(plain_text,working_key):
-    iv = '\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f'
-    plain_text = pad(plain_text)
+def encrypt(plainText,workingKey):
+    iv = b'\x00' * 16  # Ensure the IV is in bytes
+    plainText = pad(plainText).encode('utf-8')
+    encDigest = md5(workingKey.encode('utf-8')).digest()
+    enc_cipher = AES.new(encDigest, AES.MODE_CBC, iv)
+    encryptedText = enc_cipher.encrypt(plainText)
+    encryptedText_base64 = base64.b64encode(encryptedText).decode('utf-8')
+    return encryptedText_base64
 
-    byte_array_wk = bytearray()
-    byte_array_wk.extend(map(ord, working_key))
-
-    enc_cipher = AES.new(hashlib.md5(byte_array_wk).digest(), AES.MODE_CBC, iv)
-    hexl = hexlify(enc_cipher.encrypt(plain_text)).decode('utf-8')
-
-    return hexl
 
 
 def decrypt(cipherText,workingKey):
