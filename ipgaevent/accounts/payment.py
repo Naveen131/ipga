@@ -1,11 +1,14 @@
 import base64
 import hashlib
+import json
 from binascii import hexlify, unhexlify
 from hashlib import md5
 # import md5
 import requests
 from Crypto.Cipher import AES
 from django.conf import settings
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework.permissions import IsAuthenticated
 
 from ipgaevent.settings import MERCHANT_ID, WORKING_KEY, ACCESS_CODE
@@ -145,3 +148,37 @@ class CCAvenueResponseView(views.APIView):
         # You can parse response_data and update your order status
 
         return Response({'message': 'Payment successful', 'data': response_data})
+
+
+def payment_webhook(request):
+    if request.method == 'POST':
+        try:
+            payload = json.loads(request.body)
+            # Add verification logic here if needed (e.g., verify signature)
+            print("=================================", payload)
+            handle_payment_response(payload)
+            return JsonResponse({'status': 'success'})
+        except json.JSONDecodeError:
+            return JsonResponse({'status': 'error', 'message': 'Invalid payload'}, status=400)
+    return JsonResponse({'status': 'error', 'message': 'Invalid method'}, status=405)
+
+
+def handle_payment_response(payload):
+    pass
+    # # Example logic to handle the payment response
+    # order_id = payload.get('order_id')
+    # payment_status = payload.get('status')
+    # amount_paid = payload.get('amount')
+    #
+    # # Find the order by ID and update its status
+    # try:
+    #     order = Order.objects.get(id=order_id)
+    #     if payment_status == 'success':
+    #         order.status = 'paid'
+    #         order.amount_paid = amount_paid
+    #     else:
+    #         order.status = 'failed'
+    #     order.save()
+    # except Order.DoesNotExist:
+    #     # Handle the case where the order does not exist
+    #     pass
