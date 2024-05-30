@@ -6,8 +6,10 @@ from hashlib import md5
 import requests
 from Crypto.Cipher import AES
 from django.conf import settings
+from rest_framework.permissions import IsAuthenticated
 
 from ipgaevent.settings import MERCHANT_ID, WORKING_KEY, ACCESS_CODE
+from .models import UserProfile, Address
 
 BLOCK_SIZE = 16
 
@@ -83,37 +85,44 @@ from .serializers import CCAvenueRequestSerializer
 # from .utils.ccavenue import generate_ccavenue_request, validate_ccavenue_response
 
 class CCAvenuePaymentView(views.APIView):
+    permission_classes = [IsAuthenticated]
     def post(self, request, *args, **kwargs):
         serializer = CCAvenueRequestSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         data = serializer.validated_data
-        request_data = {
-            'merchant_id': MERCHANT_ID,
-            'order_id': data['order_id'],
-            'currency': data['currency'],
-            'amount': data['amount'],
-            'redirect_url': data['redirect_url'],
-            'cancel_url': data['cancel_url'],
-            'language': 'EN',
-            'billing_name': "Naveen Chaudhary",
-            'billing_address':"Test Address",
-            'billing_city': "Ghaziabad",
-            'billing_state': "Uttar Pradesh",
-            'billing_zip': "201001",
-            'billing_country': "India",
-            'billing_tel': "+919717266959",
-            'billing_email': "naveen.c131@gmail.com"
-        }
+        # request_data = {
+        #     'merchant_id': MERCHANT_ID,
+        #     'order_id': data['order_id'],
+        #     'currency': data['currency'],
+        #     'amount': data['amount'],
+        #     'redirect_url': data['redirect_url'],
+        #     'cancel_url': data['cancel_url'],
+        #     'language': 'EN',
+        #     'billing_name': "Naveen Chaudhary",
+        #     'billing_address':"Test Address",
+        #     'billing_city': "Ghaziabad",
+        #     'billing_state': "Uttar Pradesh",
+        #     'billing_zip': "201001",
+        #     'billing_country': "India",
+        #     'billing_tel': "+919717266959",
+        #     'billing_email': "naveen.c131@gmail.com"
+        # }
+
+        user = request.user
+        full_name = user.first_name + ' ' + user.last_name
+        profile = UserProfile.objects.get(user=user)
+        address = Address.objects.get(user=user)
+        currency = 'INR' if address.country.name == 'India' else 'USD'
 
         merchant_data = ('merchant_id=' + f"{MERCHANT_ID}" + '&' +
-                         'order_id=' + data['order_id'] + '&' + "currency=" + data['currency'] +
+                         'order_id=' + user.reg_id + '&' + "currency=" + currency +
                          '&' + 'amount=' + str(data['amount']) + '&' + 'redirect_url=' + data['redirect_url'] +
                          '&' + 'cancel_url=' + data['cancel_url'] + '&' + 'language=' + 'English' + '&'
-                         + 'billing_name=' + "Naveen Chaudhary" + '&' + 'billing_address=' + "Test Address"+
-                         '&' + 'billing_city=' + "Ghaziabad" + '&' + 'billing_state=' + "Uttar Pradesh" +
-                         '&' + 'billing_zip=' + "201001" + '&' + 'billing_country=' + "India" +
-                         '&' + 'billing_tel=' +"+9197171266959" + '&' + 'billing_email=' +"naveen.c131@gmail.com")
+                         + 'billing_name=' + full_name + '&' + 'billing_address=' + address.address +
+                         '&' + 'billing_city=' + address.city + '&' + 'billing_state=' + address.state +
+                         '&' + 'billing_zip=' + address.pincode + '&' + 'billing_country=' + address.country.name +
+                         '&' + 'billing_tel=' + user.mobile_number+ '&' + 'billing_email=' + user.email)
 
         # import pdb;pdb.set_trace()
         ccavenue_request = generate_ccavenue_request(merchant_data)
