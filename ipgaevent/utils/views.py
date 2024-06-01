@@ -2,7 +2,7 @@ from django.db import transaction, models
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 
-from utils.utils import CustomPagination, APIResponse
+from utils.utils import CustomPagination, APIResponse, FileFieldManager
 
 
 # from utils.common.utils import CustomPagination, APIResponse, FileFieldManager

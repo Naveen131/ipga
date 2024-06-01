@@ -160,6 +160,106 @@ class UserProfileSerializer(serializers.ModelSerializer):
         return user
 
 
+class DetailsUpdateSerializer(serializers.ModelSerializer):
+    title = serializers.CharField(required=False)
+    first_name = serializers.CharField(required=False)
+    last_name = serializers.CharField(required=False)
+    mobile_number = serializers.CharField(required=False)
+    email = serializers.EmailField(required=False)
+    organization = serializers.CharField(required=False)
+    designation = serializers.CharField(required=False)
+    gst_number = serializers.CharField(required=False)
+    gst_file = CustomBase64FileField(required=False)
+    aadhar_number = serializers.CharField(required=False)
+    aadhar_file = CustomBase64FileField(required=False)
+    passport_number = serializers.CharField(required=False)
+    passport_file = CustomBase64FileField(required=False)
+    city = serializers.CharField(required=False)
+    state = serializers.CharField(required=False)
+    country = serializers.PrimaryKeyRelatedField(queryset=Country.objects.all(),required=False)
+    pincode = serializers.CharField(required=False)
+    address = serializers.CharField(required=False)
+    business_number = serializers.CharField(required=False)
+    direct_number = serializers.CharField(required=False)
+
+
+    class Meta:
+        model = UserProfile
+        fields = ('title', 'first_name', 'last_name', 'mobile_number', 'email', 'organization', 'designation',
+                  'gst_number', 'gst_file', 'aadhar_number', 'aadhar_file', 'passport_number', 'passport_file',
+                  'city', 'state', 'country', 'pincode', 'business_number', 'direct_number', 'address')
+
+    def update(self, instance, validated_data):
+        # import pdb;pdb.set_trace()
+        # profile data
+        profile = UserProfile.objects.filter(user=instance).first()
+        profile_data = dict(
+            gst_number=validated_data.pop('gst_number', None),
+            gst_file=validated_data.pop('gst_file', None),
+            aadhar_number=validated_data.pop('aadhar_number', None),
+            aadhar_file=validated_data.pop('aadhar_file', None),
+            passport_number=validated_data.pop('passport_number', None),
+            passport_file=validated_data.pop('passport_file', None),
+            business_number=validated_data.pop('business_number', None),
+            direct_number=validated_data.pop('direct_number', None),
+        )
+
+        # update user profile
+        for key, value in profile_data.items():
+            setattr(profile, key, value)
+
+        # address object
+        country = validated_data.pop('country', None)
+        address_data = dict(
+            city=validated_data.pop('city'),
+            state=validated_data.pop('state'),
+            country=country,
+            pincode=validated_data.pop('pincode'),
+            address = validated_data.pop('address'),
+        )
+
+        # update address
+        address = Address.objects.filter(user=instance).first()
+        for key, value in address_data.items():
+            setattr(address, key, value)
+        address.save()
+
+        # update user data
+        for key, value in validated_data.items():
+            setattr(instance, key, value)
+
+        profile.save()
+        instance.save()
+        return instance
+
+
+class GetProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('title', 'first_name', 'last_name', 'mobile_number', 'email',
+                  'organization_name', 'designation',)
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        profile = UserProfile.objects.filter(user=instance).first()
+        address = Address.objects.filter(user=instance).first()
+        data['organization'] = data.pop('organization_name')
+        data['gst_number'] = profile.gst_number
+        data['aadhar_number'] = profile.aadhar_number
+        data['passport_number'] = profile.passport_number
+        data['business_number'] = profile.business_number
+        data['direct_number'] = profile.direct_number
+        data['gst_file'] = profile.gst_file.url if profile.gst_file else None
+        data['aadhar_file'] = profile.aadhar_file.url if profile.aadhar_file else None
+        data['passport_file'] = profile.passport_file.url if profile.passport_file else None
+        data['city'] = address.city
+        data['state'] = address.state
+        data['country'] = address.country.name
+        data['pincode'] = address.pincode
+        data['address'] = address.address
+        return data
+
+
 class StateSerializer(serializers.ModelSerializer):
     class Meta:
         model = State

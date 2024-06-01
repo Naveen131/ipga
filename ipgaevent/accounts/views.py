@@ -9,10 +9,11 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from accounts.models import User, State, City, Country, Membership, Address
 from accounts.serializers import SignUpSerializer, LoginSerializer, UserProfileSerializer, StateSerializer, \
-    CitySerializer, CountrySerializer, PaymentTransferSerializer
+    CitySerializer, CountrySerializer, PaymentTransferSerializer, GetProfileSerializer, DetailsUpdateSerializer
 from ipgaevent import settings
+from ipgaevent.settings import ZOHO_API_KEY
 from utils.utils import APIResponse
-from utils.views import ListAPIViewWithPagination
+from utils.views import ListAPIViewWithPagination, CustomRetrieveUpdateAPIView
 
 
 # Create your views here.
@@ -86,6 +87,17 @@ class UserDetailsAPIView(CreateAPIView):
             print(e, "====================================")
             return APIResponse(data=None, status_code=400, message="Error in updating user details")
 
+
+
+class UpdateUserDetails(CustomRetrieveUpdateAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = DetailsUpdateSerializer
+
+    def get_object(self):
+        return self.request.user
+
+    def get_view_serializer(self, instance):
+        return GetProfileSerializer(instance)
 
 class StateListView(ListAPIViewWithPagination):
     queryset = State.objects.all()
@@ -220,7 +232,7 @@ def send_zeptomail_email(to_address, to_name, subject, html_body, attachments=No
     headers = {
         'accept': "application/json",
         'content-type': "application/json",
-        'authorization': "Zoho-enczapikey PHtE6r1fQem4jTYsoxED4PXuRJKhMtgsruMyKFJPuI5KCfJVTk0Gq9x/x2K++U17VPMTHPKay4lo5LrPsbnWIW3qZ21PCWqyqK3sx/VYSPOZsbq6x00et1QSdEbZXIbsdddr1iTUstbTNA==",
+        'authorization': ZOHO_API_KEY,
     }
 
     response = requests.post(url, json=payload, headers=headers)
