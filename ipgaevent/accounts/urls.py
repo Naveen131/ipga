@@ -2,7 +2,7 @@ from django.urls import path
 
 from accounts.payment import CCAvenuePaymentView, payment_webhook, PaymentSuccessResponse
 from accounts.views import SignupAPIView, LoginAPIView, UserDetailsAPIView, StateListView, CityListView, \
-    CountryListView, CheckMembership, PaymentTransferAPIView, UpdateUserDetails
+    CountryListView, CheckMembership, PaymentTransferAPIView, UpdateUserDetails, download_user_report
 
 urlpatterns = [
     path('signup', SignupAPIView.as_view(), name='signup'),
@@ -17,4 +17,6 @@ urlpatterns = [
     path('payment', CCAvenuePaymentView.as_view(), name='ccavenue-payment'),
     path('status', payment_webhook, name='payment-webhook'),
     path('payment-success',PaymentSuccessResponse.as_view(),name='payment-success'),
-    ]
+    path('download_user_report', download_user_report, name='download_user_report'),
+
+]

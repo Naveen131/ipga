@@ -465,3 +465,59 @@ class PaymentTransferAPIView(CreateAPIView):
             return APIResponse(data=None, status_code=400, message=serializer.errors)
 
 
+
+
+import openpyxl
+from django.http import HttpResponse
+from .models import User, UserProfile, Address
+
+def generate_xls_report():
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "User Report"
+    headers = [
+        'Title', 'First Name', 'Last Name', 'Email', 'Mobile Number',
+        'Designation', 'Gender', 'Organization Name',
+        'Reg ID', 'GST Number', 'Passport Number', 'Aadhar Number',
+        'Business Number', 'Direct Number', 'Address', 'City', 'State', 'Pincode', 'Country',
+
+    ]
+    ws.append(headers)
+
+    users = User.objects.all()
+    for user in users:
+        user_profile = UserProfile.objects.filter(user=user).first()
+        addresses = Address.objects.filter(user=user)
+        address = None
+        if addresses.exists():
+            address = addresses.first()
+
+
+        row = [
+            user.title, user.first_name, user.last_name, user.email, user.mobile_number,
+            user.designation, user.gender,
+            user.organization_name,
+            user.reg_id,
+            user_profile.gst_number if user_profile else '',
+            user_profile.passport_number if user_profile else '', user_profile.aadhar_number if user_profile else '',
+            user_profile.business_number if user_profile else '', user_profile.direct_number if user_profile else '',
+            address.address if address else '', address.city if address else '', address.state if address else '',
+            address.pincode if address else '', address.country.name if address else ''
+
+        ]
+        ws.append(row)
+
+    from io import BytesIO
+    output = BytesIO()
+    wb.save(output)
+    output.seek(0)
+    return output
+
+def download_user_report(request):
+    output = generate_xls_report()
+    response = HttpResponse(
+        output,
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = 'attachment; filename="user_report.xlsx"'
+    return response
