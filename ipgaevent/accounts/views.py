@@ -491,6 +491,13 @@ def generate_xls_report():
     users = User.objects.all()
     for user in users:
         user_profile = UserProfile.objects.filter(user=user).first()
+        aadhar_file = None
+        gst_file = None
+        passport_file = None
+        if user_profile:
+            aadhar_file = user_profile.aadhar_file.url if user_profile.aadhar_file else ''
+            gst_file = user_profile.gst_file.url if user_profile.gst_file else ''
+            passport_file = user_profile.passport_file.url if user_profile.passport_file else ''
         addresses = Address.objects.filter(user=user)
         address = None
         if addresses.exists():
@@ -508,9 +515,7 @@ def generate_xls_report():
             address.address if address else '', address.city if address else '', address.state if address else '',
             address.pincode if address else '', address.country.name if address else '',
             user_profile.membership_code if user_profile else '',
-            user_profile.aadhar_file.url if user_profile else '',
-            user_profile.gst_file.url if user_profile else '',
-            user_profile.passport_file.url if user_profile else ''
+            aadhar_file, gst_file, passport_file
 
 
 
