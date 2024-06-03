@@ -7,7 +7,7 @@ from rest_framework.generics import CreateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from accounts.models import User, State, City, Country, Membership, Address
+from accounts.models import User, State, City, Country, Membership, Address, Payment
 from accounts.serializers import SignUpSerializer, LoginSerializer, UserProfileSerializer, StateSerializer, \
     CitySerializer, CountrySerializer, PaymentTransferSerializer, GetProfileSerializer, DetailsUpdateSerializer
 from ipgaevent import settings
@@ -483,7 +483,8 @@ def generate_xls_report():
         'Designation', 'Gender', 'Organization Name',
         'Reg ID', 'GST Number', 'Passport Number', 'Aadhar Number',
         'Business Number', 'Direct Number', 'Address', 'City', 'State', 'Pincode', 'Country',
-        'Membership Code', 'Aadhar File', 'Gst File', 'PassPort File'
+        'Membership Code', 'Aadhar File', 'Gst File', 'PassPort File', 'Registration Category',
+        'Payment Status', 'Payment Reference'
 
     ]
     ws.append(headers)
@@ -491,6 +492,13 @@ def generate_xls_report():
     users = User.objects.all()
     for user in users:
         user_profile = UserProfile.objects.filter(user=user).first()
+        payment = Payment.objects.filter(user=user)
+        payment_status = "Not Paid"
+        payment_ref = ""
+        if payment.exists():
+            payment = payment.first()
+            payment_status = payment.status
+            payment_ref = payment.reference_id
         aadhar_file = None
         gst_file = None
         passport_file = None
@@ -515,7 +523,9 @@ def generate_xls_report():
             address.address if address else '', address.city if address else '', address.state if address else '',
             address.pincode if address else '', address.country.name if address else '',
             user_profile.membership_code if user_profile else '',
-            aadhar_file, gst_file, passport_file
+            aadhar_file, gst_file, passport_file,
+            "Delegate",
+            payment_status, payment_ref
 
 
 
