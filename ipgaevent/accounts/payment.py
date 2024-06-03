@@ -312,7 +312,8 @@ def send_registration_confirmation_email(user, payment):
         'gst_amount': currency + ' ' + str(payment.tax),
         'qty': '1',
         'amount': currency + ' ' + str(amount),
-        'total_owing': currency + ' ' + str(payment.amount + payment.tax)
+        'total_owing': currency + ' ' + str(payment.amount + payment.tax),
+        'invoice_number': 'INV2024' + str(user.reg_id),
     }
 
     html_string = render_to_string('invoice.html', context)

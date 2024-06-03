@@ -181,13 +181,14 @@ class DetailsUpdateSerializer(serializers.ModelSerializer):
     address = serializers.CharField(required=False)
     business_number = serializers.CharField(required=False)
     direct_number = serializers.CharField(required=False)
+    gender = serializers.CharField(required=False)
 
 
     class Meta:
         model = UserProfile
         fields = ('title', 'first_name', 'last_name', 'mobile_number', 'email', 'organization', 'designation',
                   'gst_number', 'gst_file', 'aadhar_number', 'aadhar_file', 'passport_number', 'passport_file',
-                  'city', 'state', 'country', 'pincode', 'business_number', 'direct_number', 'address')
+                  'city', 'state', 'country', 'pincode', 'business_number', 'direct_number', 'address', 'gender')
 
     def update(self, instance, validated_data):
         # import pdb;pdb.set_trace()
@@ -237,7 +238,7 @@ class GetProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('title', 'first_name', 'last_name', 'mobile_number', 'email',
-                  'organization_name', 'designation',)
+                  'organization_name', 'designation', 'gender')
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
