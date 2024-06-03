@@ -146,6 +146,9 @@ class CheckMembership(CreateAPIView):
                data = {
                     'is_membership': True
                 }
+               profile = UserProfile.objects.filter(user=user).first()
+               profile.membership_code = code
+               profile.save()
                return APIResponse(data=data, status_code=200, message="Membership code applied successfully")
             else:
                 data = {
@@ -480,6 +483,7 @@ def generate_xls_report():
         'Designation', 'Gender', 'Organization Name',
         'Reg ID', 'GST Number', 'Passport Number', 'Aadhar Number',
         'Business Number', 'Direct Number', 'Address', 'City', 'State', 'Pincode', 'Country',
+        'Membership Code', 'Aadhar File', 'Gst File', 'PassPort File'
 
     ]
     ws.append(headers)
@@ -502,7 +506,14 @@ def generate_xls_report():
             user_profile.passport_number if user_profile else '', user_profile.aadhar_number if user_profile else '',
             user_profile.business_number if user_profile else '', user_profile.direct_number if user_profile else '',
             address.address if address else '', address.city if address else '', address.state if address else '',
-            address.pincode if address else '', address.country.name if address else ''
+            address.pincode if address else '', address.country.name if address else '',
+            user_profile.membership_code if user_profile else '',
+            user_profile.aadhar_file.url if user_profile else '',
+            user_profile.gst_file.url if user_profile else '',
+            user_profile.passport_file.url if user_profile else ''
+
+
+
 
         ]
         ws.append(row)

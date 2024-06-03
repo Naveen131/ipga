@@ -98,6 +98,7 @@ class UserProfile(models.Model):
     aadhar_file = models.FileField(storage=PublicMediaStorage(),upload_to='aadhar_files/', null=True, blank=True)
     business_number = models.CharField(max_length=20, null=True, blank=True)
     direct_number = models.CharField(max_length=20, null=True, blank=True)
+    membership_code = models.CharField(max_length=255, null=True, blank=True)
 
 
 class City(models.Model):
