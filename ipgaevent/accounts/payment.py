@@ -403,6 +403,7 @@ class PaymentSuccessResponse(CreateAPIView):
         amount = data.get('amount')
         tax = data.get('tax')
         user = request.user
+        amount = amount - tax
         payment = Payment.objects.create(user=user, amount=amount, payment_date=timezone.now(), status='Success', tax=tax)
         send_registration_confirmation_email(user, payment)
         return APIResponse(message='Payment successful', data={'payment_id': payment.id}, status_code=200)
