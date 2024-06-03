@@ -332,7 +332,7 @@ def send_registration_confirmation_email(user, payment):
     attachments = [{
         "content": pdf_content_base64,
         "mime_type": "application/pdf",
-        "name": "proforma_invoice.pdf"
+        "name": "invoice.pdf"
     }]
     # Attach PDF to the email
     # attachments = ('proforma_invoice.pdf', pdf_file, 'application/pdf')
