@@ -484,7 +484,7 @@ def generate_xls_report():
         'Reg ID', 'GST Number', 'Passport Number', 'Aadhar Number',
         'Business Number', 'Direct Number', 'Address', 'City', 'State', 'Pincode', 'Country',
         'Membership Code', 'Aadhar File', 'Gst File', 'PassPort File', 'Registration Category',
-        'Payment Status', 'Payment Reference'
+        'Payment Status', 'Payment Reference', 'Payment Date', 'Payment Amount', 'Payment Tax', 'Payment Total',
 
     ]
     ws.append(headers)
@@ -525,7 +525,11 @@ def generate_xls_report():
             user_profile.membership_code if user_profile else '',
             aadhar_file, gst_file, passport_file,
             "Delegate",
-            payment_status, payment_ref
+            payment_status, payment_ref,
+            payment.payment_date,
+            payment.amount,
+            payment.tax,
+            payment.amount + payment.tax
 
 
 
