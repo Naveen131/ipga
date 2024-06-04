@@ -505,7 +505,7 @@ def generate_xls_report():
             payment_status = payment.status
             payment_ref = payment.reference_id
             payment_tax = payment.tax
-            payment_date = payment.payment_date.date()
+            payment_date = payment.payment_date.date() if payment.payment_date else ""
             payment_amount = payment.amount
             payment_total = payment.amount + payment.tax
         aadhar_file = None
