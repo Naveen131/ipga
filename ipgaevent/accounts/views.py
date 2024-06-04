@@ -495,10 +495,19 @@ def generate_xls_report():
         payment = Payment.objects.filter(user=user)
         payment_status = "Not Paid"
         payment_ref = ""
+        payment_date = ""
+        payment_amount = 0
+        payment_tax = 0
+        payment_total = 0
+
         if payment.exists():
             payment = payment.first()
             payment_status = payment.status
             payment_ref = payment.reference_id
+            payment_tax = payment.tax
+            payment_date = payment.payment_date
+            payment_amount = payment.amount
+            payment_total = payment.amount + payment.tax
         aadhar_file = None
         gst_file = None
         passport_file = None
@@ -526,10 +535,7 @@ def generate_xls_report():
             aadhar_file, gst_file, passport_file,
             "Delegate",
             payment_status, payment_ref,
-            payment.payment_date,
-            payment.amount,
-            payment.tax,
-            payment.amount + payment.tax
+            payment_date, payment_amount, payment_tax, payment_total
 
 
 
