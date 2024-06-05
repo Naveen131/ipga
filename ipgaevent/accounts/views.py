@@ -479,7 +479,7 @@ def generate_xls_report():
     ws = wb.active
     ws.title = "User Report"
     headers = [
-        'Title', 'First Name', 'Last Name', 'Email', 'Mobile Number',
+        'Title', 'Date Joined', 'First Name', 'Last Name', 'Email', 'Mobile Number',
         'Designation', 'Gender', 'Organization Name',
         'Reg ID', 'GST Number', 'Passport Number', 'Aadhar Number',
         'Business Number', 'Direct Number', 'Address', 'City', 'State', 'Pincode', 'Country',
@@ -489,8 +489,9 @@ def generate_xls_report():
     ]
     ws.append(headers)
 
-    users = User.objects.all()
+    users = User.objects.all().order_by('id')
     for user in users:
+        date_joined = user.date_joined.date()
         user_profile = UserProfile.objects.filter(user=user).first()
         payment = Payment.objects.filter(user=user)
         payment_status = "Not Paid"
@@ -522,7 +523,7 @@ def generate_xls_report():
 
 
         row = [
-            user.title, user.first_name, user.last_name, user.email, user.mobile_number,
+            user.title, date_joined, user.first_name, user.last_name, user.email, user.mobile_number,
             user.designation, user.gender,
             user.organization_name,
             user.reg_id,
