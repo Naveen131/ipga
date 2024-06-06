@@ -289,12 +289,12 @@ def send_registration_confirmation_email(user, payment):
 
     """
     html_body = html_template.replace('{{RegID}}', user.reg_id)
-    html_body = html_body.replace('{{Title}}', user.title)
+    html_body = html_body.replace('{{Title}}', user.title if user.title else 'Mr.')
     html_body = html_body.replace('{{Firstname}}', user.first_name)
     html_body = html_body.replace('{{LastName}}', user.last_name)
     html_body = html_body.replace('{{amountRequired}}', str(payment.amount + payment.tax))
     html_body = html_body.replace('{{amountOutstanding}}', str(0))
-    html_body = html_body.replace('{{paymentStatus}}',payment.status)
+    html_body = html_body.replace('{{paymentStatus}}', payment.status)
     html_body = html_body.replace('{{invoiceNumber}}', 'INV2024' + str(payment.id))
     html_body = html_body.replace('{{dateOfPayment}}', str(payment.payment_date.date()))
     html_body = html_body.replace('{{currency}}', currency)

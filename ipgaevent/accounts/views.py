@@ -401,7 +401,7 @@ def send_registration_confirmation_email(user, payment):
 
     # Populate the HTML content with actual values
     html_body = html_template.replace('{{ RegID }}', user.reg_id if user.reg_id else '')
-    html_body = html_body.replace('{{ Title }}', user.title if user.title else '')
+    html_body = html_body.replace('{{ Title }}', user.title if user.title else 'Mr.')
     html_body = html_body.replace('{{ Firstname }}', user.first_name)
     html_body = html_body.replace('{{ Lastname }}', user.last_name if user.last_name else '')
     html_body = html_body.replace('{{ RegCategory }}', 'Delegate')
