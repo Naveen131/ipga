@@ -292,14 +292,14 @@ def send_registration_confirmation_email(user, payment):
     html_body = html_body.replace('{{Title}}', user.title)
     html_body = html_body.replace('{{Firstname}}', user.first_name)
     html_body = html_body.replace('{{LastName}}', user.last_name)
-    html_body = html_body.replace('{{amountRequired}}', str(payment.amount))
+    html_body = html_body.replace('{{amountRequired}}', str(payment.amount + payment.tax))
     html_body = html_body.replace('{{amountOutstanding}}', str(0))
     html_body = html_body.replace('{{paymentStatus}}', 'Pending')
     html_body = html_body.replace('{{invoiceNumber}}', 'INV2024' + str(payment.id))
     html_body = html_body.replace('{{dateOfPayment}}', str(payment.payment_date.date()))
     html_body = html_body.replace('{{currency}}', currency)
     html_body = html_body.replace('{{paymentReference}}', payment.payment_mode)
-    html_body = html_body.replace('{{totalPaidAmount}}', str(payment.amount))
+    html_body = html_body.replace('{{totalPaidAmount}}', str(payment.amount + payment.tax))
     address = Address.objects.get(user=user)
     profile = UserProfile.objects.get(user=user)
 
@@ -314,6 +314,7 @@ def send_registration_confirmation_email(user, payment):
         'amount': currency + ' ' + str(amount),
         'total_owing': currency + ' ' + str(payment.amount + payment.tax),
         'invoice_number': 'INV2024' + str(user.reg_id),
+        'company': user.organization_name
     }
 
     html_string = render_to_string('invoice.html', context)
