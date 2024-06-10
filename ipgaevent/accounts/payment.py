@@ -295,7 +295,7 @@ def send_registration_confirmation_email(user, payment):
     html_body = html_body.replace('{{amountRequired}}', str(payment.amount + payment.tax))
     html_body = html_body.replace('{{amountOutstanding}}', str(0))
     html_body = html_body.replace('{{paymentStatus}}', payment.status)
-    html_body = html_body.replace('{{invoiceNumber}}', 'INV2024' + str(payment.id))
+    html_body = html_body.replace('{{invoiceNumber}}', str(user.reg_id))
     html_body = html_body.replace('{{dateOfPayment}}', str(payment.payment_date.date()))
     html_body = html_body.replace('{{currency}}', currency)
     html_body = html_body.replace('{{paymentReference}}', payment.payment_mode)

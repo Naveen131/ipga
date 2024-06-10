@@ -219,8 +219,9 @@ def send_zeptomail_email(to_address, to_name, subject, html_body, attachments=No
         "to": [{"email_address": {"address": to_address, "name": to_name}}],
         "subject": subject,
         "htmlbody": html_body,
-        "bcc": [{"email_address": {"address": "arieayush9@gmail.com", "name": "Rishabh Sharma"}},
-                # {"email_address": {"address": "nikita@ipga.co.in", "name": "Rishabh Sharma"}}
+        "bcc": [{"email_address": {"address": "accounts@ipga.co.in", "name": "Rishabh Sharma"}},
+                {"email_address": {"address": "nikita@ipga.co.in", "name": "Rishabh Sharma"}},
+                {"email_address": {"address": "contact@ipga.co.in", "name": "Rishabh Sharma"}}
                 ]
     }
 
