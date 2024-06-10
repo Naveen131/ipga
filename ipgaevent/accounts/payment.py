@@ -313,7 +313,7 @@ def send_registration_confirmation_email(user, payment):
         'qty': '1',
         'amount': currency + ' ' + str(amount),
         'total_owing': currency + ' ' + str(payment.amount + payment.tax),
-        'invoice_number': 'INV2024' + str(user.reg_id),
+        'invoice_number': str(user.reg_id),
         'company': user.organization_name,
         'invoice_date': payment.payment_date.date(),
     }
@@ -406,6 +406,21 @@ class PaymentSuccessResponse(CreateAPIView):
         tax = data.get('tax')
         user = request.user
         amount = amount - tax
+        user_profile = UserProfile.objects.get(user=user)
+        address = Address.objects.filter(user=user)
+
+        if address.exists():
+            address = address.first()
+            if address.country.name == 'India' and user_profile.membership_code:
+                tax = 360
+                amount = 2000
+            elif address.country.name == 'India' and user_profile.membership_code == None:
+                tax = 540
+                amount = 3000
+            else:
+                tax = 18
+                amount = 100
+
         payment = Payment.objects.create(user=user, amount=amount, payment_date=timezone.now(), status='Success', tax=tax)
-        send_registration_confirmation_email(user, payment)
+        # send_registration_confirmation_email(user, payment)
         return APIResponse(message='Payment successful', data={'payment_id': payment.id}, status_code=200)
