@@ -38,7 +38,23 @@ class User(AbstractUser, PermissionsMixin):
     username = None
     USER_TYPE = (
         ('Internal', 'Internal'),
-        ('Client', 'Client')
+        ('Client', 'Client'),
+        ('Delegate', 'Delegate'),
+        ('VIP', 'VIP'),
+        ('Speaker', 'Speaker'),
+        ('Sponsor', 'Sponsor'),
+        ('Exhibitor', 'Exhibitor'),
+        ('Media', 'Media'),
+        ('Crew', 'Crew'),
+        ('Diplomat', 'Diplomat'),
+        ('Vendor', 'Vendor'),
+        ('Team', 'Team'),
+        ('Executive Committee Member', 'Executive Committee Member'),
+        ('Director', 'Director'),
+        ('Chairman', 'Chairman'),
+        ('Honorary Secretary', 'Honorary Secretary'),
+        ('Vice Chairman', 'Vice Chairman'),
+
     )
 
     GENDER = (

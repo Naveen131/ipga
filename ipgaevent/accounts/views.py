@@ -537,7 +537,7 @@ def generate_xls_report():
             address.pincode if address else '', address.country.name if address else '',
             user_profile.membership_code if user_profile else '',
             aadhar_file, gst_file, passport_file,
-            "Delegate",
+            "Delegate" if user.user_type =='Internal' else user.user_type,
             payment_status, payment_ref,
             payment_date, payment_amount, payment_tax, payment_total
 
