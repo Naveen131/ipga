@@ -310,7 +310,7 @@ def send_registration_confirmation_email(user, payment):
         'customer_gstn':profile.gst_number,
         'delegate_type': 'Delegate',
         'gst_amount': currency + ' ' + str(payment.tax),
-        'qty': '6',
+        'qty': '1',
         'amount': currency + ' ' + str(amount),
         'total_owing': currency + ' ' + str(payment.amount + payment.tax),
         'invoice_number': str(user.reg_id),
