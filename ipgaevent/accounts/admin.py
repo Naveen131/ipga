@@ -57,6 +57,10 @@ class AddressAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     search_fields = ['user__email', 'address', 'city__name', 'state__name', 'country__name', 'pincode__pincode']
 
 
+class PaymentAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+    list_display = ['user', 'amount', 'payment_date',]
+    search_fields = ['user__email' 'amount']
+
 # Register your models here.
 admin.site.register(User, UserAdmin)
 admin.site.register(UserProfile, UserProfileAdmin)
@@ -66,4 +70,4 @@ admin.site.register(Country, CountryAdmin)
 admin.site.register(Pincode, PincodeAdmin)
 admin.site.register(Address, AddressAdmin)
 admin.site.register(Membership, MembershipAdmin)
-admin.site.register(Payment)
+admin.site.register(Payment, PaymentAdmin)
