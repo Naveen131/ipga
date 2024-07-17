@@ -55,7 +55,6 @@ class MembershipAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 class AddressAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     list_display = ['user', 'address', 'city', 'state', 'country', 'pincode']
     search_fields = ['user__email', 'address', 'city__name', 'state__name', 'country__name', 'pincode__pincode']
-    list_filter = ['city__name', 'state__name', 'country__name', 'pincode__pincode']
 
 
 # Register your models here.
@@ -65,6 +64,6 @@ admin.site.register(City, CityAdmin)
 admin.site.register(State, StateAdmin)
 admin.site.register(Country, CountryAdmin)
 admin.site.register(Pincode, PincodeAdmin)
-admin.site.register(Address)
+admin.site.register(Address, AddressAdmin)
 admin.site.register(Membership, MembershipAdmin)
 admin.site.register(Payment)
