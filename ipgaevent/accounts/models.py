@@ -2,6 +2,7 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser, PermissionsMixin
 from django.db import models
 
+from accounts.views import send_registration_confirmation_email
 from ipgaevent.storage_backends import PublicMediaStorage
 
 
@@ -93,6 +94,11 @@ class User(AbstractUser, PermissionsMixin):
 
     def __str__(self):
         return self.email if self.email else "Undefined User"
+
+    def send_proforma_invoice(self):
+        print("Proforma Invoice sent successfully")
+        payment = Payment.objects.filter(user=self).first()
+        send_registration_confirmation_email(self, payment)
 
 
 

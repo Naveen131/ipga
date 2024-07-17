@@ -9,6 +9,13 @@ class UserAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     search_fields = ['email', 'mobile_number']
     list_filter = ['is_active', 'is_staff', 'is_superuser']
 
+    actions = ['send_proforma_invoice']
+
+    def send_proforma_invoice(self, request, queryset):
+        for user in queryset:
+            user.send_proforma_invoice()
+        self.message_user(request, "Proforma Invoice sent successfully")
+
 
 class UserProfileAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     list_display = ['user', 'gst_number', 'passport_number', 'aadhar_number']
