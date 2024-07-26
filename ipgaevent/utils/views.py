@@ -85,11 +85,12 @@ class CustomRetrieveUpdateAPIView(generics.RetrieveUpdateDestroyAPIView):
             return APIResponse(data=None, message="Object Does not exist", status_code=400)
         serializer = self.serializer_class(data=request.data, context={'request': request})
         if not serializer.is_valid():
+            print(serializer.errors)
             errors = []
             for field, messages in serializer.errors.items():
                 errors.extend((messages[0] if type(messages) == list else messages))
 
-            return APIResponse(data=None, status_code=400,
+            return APIResponse(data=serializer.errors, status_code=400,
                                message=errors[0].__str() if type(errors[0])=='rest_framework.exceptions.ErrorDetail'
                                else errors[0])
 
