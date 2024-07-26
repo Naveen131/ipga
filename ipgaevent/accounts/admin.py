@@ -23,6 +23,11 @@ class UserAdmin(ImportExportModelAdmin,admin.ModelAdmin):
                 user.send_payment_reminder()
         self.message_user(request, "Payment Reminder sent successfully")
 
+    def send_apology(self, request, queryset):
+        for user in queryset:
+            user.send_apology()
+        self.message_user(request, "Apology sent successfully")
+
 
 class UserProfileAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     list_display = ['user', 'gst_number', 'passport_number', 'aadhar_number']
@@ -66,7 +71,8 @@ class AddressAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 
 class PaymentAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     list_display = ['user', 'amount', 'payment_date',]
-    search_fields = ['user__email' 'amount']
+    search_fields = ['user__email', 'amount']
+
 
 # Register your models here.
 admin.site.register(User, UserAdmin)
