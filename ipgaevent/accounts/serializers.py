@@ -237,7 +237,8 @@ class DetailsUpdateSerializer(serializers.ModelSerializer):
 
         # update user profile
         for key, value in profile_data.items():
-            setattr(profile, key, value)
+            if value is not None:
+                setattr(profile, key, value)
 
         # address object
         country = validated_data.pop('country', None)
