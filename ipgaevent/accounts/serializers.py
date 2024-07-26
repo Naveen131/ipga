@@ -1,3 +1,9 @@
+import base64
+import uuid
+
+import requests
+from django.core.files.base import ContentFile
+from django.utils.text import slugify
 from rest_framework import serializers
 
 from accounts.models import User, UserProfile, City, State, Country, Pincode, Address, Payment
@@ -160,7 +166,29 @@ class UserProfileSerializer(serializers.ModelSerializer):
         return user
 
 
+class Base64OrURLFileField(serializers.FileField):
+
+    def to_internal_value(self, data):
+        # If data is a URL
+        if isinstance(data, str) and data.startswith('http'):
+            response = requests.get(data)
+            if response.status_code == 200:
+                file_name = uuid.uuid4().hex
+                return ContentFile(response.content, name=file_name)
+            else:
+                raise serializers.ValidationError('Invalid file URL.')
+
+        # If data is a base64 string
+        elif isinstance(data, str) and 'data:' in data and ';base64,' in data:
+            format, imgstr = data.split(';base64,')
+            ext = format.split('/')[-1]
+            file_name = f"{uuid.uuid4().hex}.{ext}"
+            return ContentFile(base64.b64decode(imgstr), name=file_name)
+
+        raise serializers.ValidationError('Invalid file data.')
+
 class DetailsUpdateSerializer(serializers.ModelSerializer):
+    title = serializers.CharField(required=False)
     title = serializers.CharField(required=False)
     first_name = serializers.CharField(required=False)
     last_name = serializers.CharField(required=False)
@@ -169,14 +197,14 @@ class DetailsUpdateSerializer(serializers.ModelSerializer):
     organization = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     designation = serializers.CharField(required=False)
     gst_number = serializers.CharField(required=False, allow_null=True, allow_blank=True)
-    gst_file = CustomBase64FileField(required=False)
+    gst_file = Base64OrURLFileField(required=False)
     aadhar_number = serializers.CharField(required=False, allow_null=True, allow_blank=True)
-    aadhar_file = CustomBase64FileField(required=False)
+    aadhar_file = Base64OrURLFileField(required=False)
     passport_number = serializers.CharField(required=False, allow_null=True, allow_blank=True)
-    passport_file = CustomBase64FileField(required=False)
+    passport_file = Base64OrURLFileField(required=False)
     city = serializers.CharField(required=False)
     state = serializers.CharField(required=False)
-    country = serializers.PrimaryKeyRelatedField(queryset=Country.objects.all(),required=False)
+    country = serializers.PrimaryKeyRelatedField(queryset=Country.objects.all(), required=False)
     pincode = serializers.CharField(required=False)
     address = serializers.CharField(required=False)
     business_number = serializers.CharField(required=False)
@@ -193,6 +221,8 @@ class DetailsUpdateSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         # import pdb;pdb.set_trace()
         # profile data
+
+
         profile = UserProfile.objects.filter(user=instance).first()
         profile_data = dict(
             gst_number=validated_data.pop('gst_number', None),
