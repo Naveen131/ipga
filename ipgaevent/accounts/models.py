@@ -1,11 +1,104 @@
+import base64
+import tempfile
+
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser, PermissionsMixin
 from django.db import models
+from django.template.loader import render_to_string
+from weasyprint import HTML
 
 from ipgaevent.storage_backends import PublicMediaStorage
 
 
 # Create your models here.
+
+
+def send_payment_reminder_email(user):
+    try:
+        from accounts.views import send_zeptomail_email
+
+        profile = UserProfile.objects.get(user=user)
+        address = Address.objects.filter(user=user)
+
+        currency = 'INR'
+
+        if address.exists():
+            address = address.first()
+            if address.country.name == 'India' and profile.membership_code:
+                tax = 360
+                amount = 2000
+            elif address.country.name == 'India' and profile.membership_code == None:
+                tax = 540
+                amount = 3000
+            else:
+                tax = 18
+                amount = 100
+                currency = 'USD'
+
+        html_body = """<!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>BDS 2024 Payment Reminder</title>
+    </head>
+    <body>
+        <p>Email Subject – <strong>BDS 2024 | Payment Reminder</strong></p>
+    
+        <p>Thank you for showing your interest in participating in the Bharat Dalhan Seminar 2024, at Vigyan Bhawan, New Delhi.</p>
+    
+        <p>Please note that your registration is not confirmed until you complete the process and remit the payment. We request you to kindly login to the registration portal, using your existing login credentials and make the online/offline payment at the earliest to confirm your registration.</p>
+    
+        <p>If you have already processed your payment, please update us with the payment details so we can confirm and validate your registration.</p>
+    
+        <p>Kindly let us know if you need any further assistance to process the payment.</p>
+    
+        <p>Best regards,</p>
+    
+        <p>Registration Support Desk | Bharat Dalhan Seminar 2024<br>
+        Email ID: <a href="mailto:bds2024@ipga.co.in">bds2024@ipga.co.in</a><br>
+        Phone: 022 - 24909133 / 022 - 35619327</p>
+    </body>
+    </html>
+    """
+
+        context = {
+
+            'customer_name': user.first_name + ' ' + user.last_name,
+            'customer_address': address.address + ' ' + address.city + ', ' + address.state + ', ' + address.country.name,
+
+            'delegate_type': 'Delegate',
+            'gst_amount': currency + ' ' + str(tax),
+            'qty': '1',
+            'amount': currency + ' ' + str(amount),
+            'total_owing': currency + ' ' + str(amount + tax)
+        }
+        to_address = user.email
+        to_name = user.first_name + ' ' + user.last_name
+        subject = "BDS 2024 | Payment Reminder"
+        html_string = render_to_string('proforma_email.html', context)
+        html = HTML(string=html_string)
+        pdf_file = html.write_pdf()
+
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.pdf') as temp_pdf_file:
+            temp_pdf_file.write(pdf_file)
+            temp_pdf_file_path = temp_pdf_file.name
+
+            # Attach PDF to the email
+        with open(temp_pdf_file_path, "rb") as file:
+            pdf_content_base64 = base64.b64encode(file.read()).decode("utf-8")
+
+        # Prepare attachment payload
+        attachments = [{
+            "content": pdf_content_base64,
+            "mime_type": "application/pdf",
+            "name": "proforma_invoice.pdf"
+        }]
+
+        send_zeptomail_email(to_address, to_name, subject, html_body, attachments=attachments)
+    except Exception as e:
+        pass
+
 
 
 class CustomUserManager(BaseUserManager):
@@ -100,6 +193,10 @@ class User(AbstractUser, PermissionsMixin):
         print("Proforma Invoice sent successfully")
         payment = Payment.objects.filter(user=self).first()
         send_registration_confirmation_email(self, payment)
+
+    def send_payment_reminder(self):
+        print("Payment Reminder sent successfully")
+        send_payment_reminder_email(self)
 
 
 

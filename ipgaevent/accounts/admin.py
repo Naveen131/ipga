@@ -9,12 +9,19 @@ class UserAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     search_fields = ['email', 'mobile_number']
     list_filter = ['is_active', 'is_staff', 'is_superuser']
 
-    actions = ['send_proforma_invoice']
+    actions = ['send_proforma_invoice', 'send_payment_reminder']
 
     def send_proforma_invoice(self, request, queryset):
         for user in queryset:
             user.send_proforma_invoice()
         self.message_user(request, "Proforma Invoice sent successfully")
+
+    def send_payment_reminder(self, request, queryset):
+        for user in queryset:
+            payment = Payment.objects.filter(user=user, status="Success")
+            if not payment.exists():
+                user.send_payment_reminder()
+        self.message_user(request, "Payment Reminder sent successfully")
 
 
 class UserProfileAdmin(ImportExportModelAdmin,admin.ModelAdmin):

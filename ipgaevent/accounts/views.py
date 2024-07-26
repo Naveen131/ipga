@@ -408,7 +408,7 @@ def send_registration_confirmation_email(user, payment):
     html_body = html_body.replace('{{ Lastname }}', user.last_name if user.last_name else '')
     html_body = html_body.replace('{{ RegCategory }}', 'Delegate')
     html_body = html_body.replace('{{Currency}}', currency)
-    html_body = html_body.replace('{{ Amountrequired }}', str(amount))
+    html_body = html_body.replace('{{ Amountrequired }}', str(amount+payment.tax))
     html_body = html_body.replace('{{ Payment Status }}', 'Not paid')
     address = Address.objects.filter(user=user).first()
     # payment = Payment.objects.filter(user=user).first()
