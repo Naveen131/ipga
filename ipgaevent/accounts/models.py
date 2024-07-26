@@ -13,6 +13,70 @@ from ipgaevent.storage_backends import PublicMediaStorage
 # Create your models here.
 
 
+def send_apology_email(user):
+    from accounts.views import send_zeptomail_email
+    html_body= """<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Payment Reminder Apology</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .content {
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Bharat Dalhan Seminar 2024</h2>
+        </div>
+        <div class="content">
+            <p>Dear Sir/Ma’am,</p>
+            <p>Greetings from the Bharat Dalhan Seminar 2024!</p>
+            <p>We apologize for the wrong and misleading payment reminder email which you have received earlier due to a technical glitch.</p>
+            <p>We request you to ignore the same as your registration is complete and confirmed.</p>
+            <p>We are looking forward to seeing you at the seminar.</p>
+        </div>
+        <div class="footer">
+            <p>Kind Regards,<br>
+            Registration Desk | Bharat Dalhan Seminar 2024</p>
+        </div>
+    </div>
+</body>
+</html>
+"""
+
+    to_address = user.email
+    to_name = user.first_name + ' ' + user.last_name
+    subject = "Apology for incorrect email | Bharat Dalhan Seminar 2024"
+    attachments = []
+    send_zeptomail_email(to_address, to_name, subject, html_body, attachments=attachments)
+
+
 def send_payment_reminder_email(user):
     try:
         from accounts.views import send_zeptomail_email
@@ -197,6 +261,9 @@ class User(AbstractUser, PermissionsMixin):
     def send_payment_reminder(self):
         print("Payment Reminder sent successfully")
         send_payment_reminder_email(self)
+
+    def send_apology(self):
+        send_apology_email(self)
 
 
 

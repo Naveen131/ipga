@@ -9,7 +9,7 @@ class UserAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     search_fields = ['email', 'mobile_number']
     list_filter = ['is_active', 'is_staff', 'is_superuser']
 
-    actions = ['send_proforma_invoice', 'send_payment_reminder']
+    actions = ['send_proforma_invoice', 'send_payment_reminder', 'send_apology']
 
     def send_proforma_invoice(self, request, queryset):
         for user in queryset:
