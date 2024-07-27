@@ -72,6 +72,7 @@ class AddressAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 class PaymentAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     list_display = ['user', 'amount', 'payment_date',]
     search_fields = ['user__email', 'amount']
+    raw_id_fields = ['user']
 
 
 # Register your models here.
