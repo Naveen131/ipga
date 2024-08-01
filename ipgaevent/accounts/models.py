@@ -242,7 +242,7 @@ class User(AbstractUser, PermissionsMixin):
     organization_name = models.CharField(max_length=255, null=True, blank=True)
     nationality = models.ForeignKey(Nationality, on_delete=models.CASCADE, null=True, blank=True)
     reg_id = models.CharField(max_length=255, null=True, blank=True)
-    password = models.CharField(max_length=255)
+    # password = models.CharField(max_length=255)
     objects = CustomUserManager()
 
     USERNAME_FIELD = "email"
@@ -250,6 +250,12 @@ class User(AbstractUser, PermissionsMixin):
 
     def __str__(self):
         return self.email if self.email else "Undefined User"
+
+    def save(self, *args, **kwargs):
+        if self.password:
+            self.set_password(self.password)
+        super(User, self).save(*args, **kwargs)
+
 
     def send_proforma_invoice(self):
         from accounts.views import send_registration_confirmation_email
