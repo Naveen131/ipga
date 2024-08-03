@@ -1,6 +1,8 @@
 from django.contrib import admin
+# from django.contrib.auth.forms import UserCreationForm
 from import_export.admin import ImportExportModelAdmin
 
+from accounts.forms import UserCreationForm
 from accounts.models import User, UserProfile, City, State, Country, Pincode, Address, Membership, Payment
 
 
@@ -10,7 +12,8 @@ class UserAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     list_filter = ['is_active', 'is_staff', 'is_superuser']
 
     actions = ['send_proforma_invoice', 'send_payment_reminder', 'send_apology']
-
+    form = UserCreationForm
+    # exclude = ['username']
     def send_proforma_invoice(self, request, queryset):
         for user in queryset:
             user.send_proforma_invoice()

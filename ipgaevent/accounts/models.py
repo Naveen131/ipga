@@ -251,10 +251,11 @@ class User(AbstractUser, PermissionsMixin):
     def __str__(self):
         return self.email if self.email else "Undefined User"
 
-    def save(self, *args, **kwargs):
-        if self.password:
-            self.set_password(self.password)
-        super(User, self).save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #
+    #     if self.password:
+    #         self.set_password(self.password)
+    #     super(User, self).save(*args, **kwargs)
 
 
     def send_proforma_invoice(self):
