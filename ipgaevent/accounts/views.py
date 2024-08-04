@@ -570,12 +570,19 @@ class RegisterOffsiteView(CreateAPIView):
     def post(self, request, *args, **kwargs):
         serializer = RegisterOffsiteUser(data=request.data)
         try:
-            if serializer.is_valid():
+            if not serializer.is_valid():
+                errors = []
+                for field, messages in serializer.errors.items():
+                    errors.append(messages[0] if type(messages) == list else messages)
+
+                return APIResponse(data=None, status_code=400,
+                                   message=errors[0].__str__() if type(
+                                       errors[0]) == 'rest_framework.exceptions.ErrorDetail'
+                                   else errors[0])
+            else:
                 instance = serializer.create(serializer.validated_data)
                 data = GetOffsiteUserSerializer(instance).data
-                return APIResponse(data=data, status_code=200, message="User registered successfully")
-            else:
-                return APIResponse(data=None, status_code=400, message=serializer.errors)
+                return APIResponse(data=data, status_code=400, message="User registered successfully")
         except Exception as e:
             return APIResponse(data=None, status_code=400, message=str(e))
 
