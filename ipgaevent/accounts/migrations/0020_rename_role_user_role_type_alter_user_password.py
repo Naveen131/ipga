@@ -15,9 +15,9 @@ class Migration(migrations.Migration):
             old_name='role',
             new_name='role_type',
         ),
-        migrations.AlterField(
-            model_name='user',
-            name='password',
-            field=models.CharField(max_length=128, verbose_name='password'),
-        ),
+        # migrations.AlterField(
+        #     model_name='user',
+        #     name='password',
+        #     field=models.CharField(max_length=128, verbose_name='password'),
+        # ),
     ]
