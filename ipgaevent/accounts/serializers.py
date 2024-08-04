@@ -189,7 +189,6 @@ class Base64OrURLFileField(serializers.FileField):
 
 class DetailsUpdateSerializer(serializers.ModelSerializer):
     title = serializers.CharField(required=False)
-    title = serializers.CharField(required=False)
     first_name = serializers.CharField(required=False)
     last_name = serializers.CharField(required=False)
     mobile_number = serializers.CharField(required=False)
@@ -292,6 +291,36 @@ class GetProfileSerializer(serializers.ModelSerializer):
         return data
 
 
+class GetOffsiteUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('title', 'first_name', 'last_name', 'mobile_number', 'email',
+                  'organization_name', 'designation', 'gender')
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        profile = UserProfile.objects.filter(user=instance).first()
+        address = Address.objects.filter(user=instance).first()
+        data['organization'] = data.pop('organization_name')
+        data['gst_number'] = profile.gst_number
+        data['aadhar_number'] = profile.aadhar_number
+        data['passport_number'] = profile.passport_number
+        data['business_number'] = profile.business_number
+        data['direct_number'] = profile.direct_number
+        data['gst_file'] = profile.gst_file.url if profile.gst_file else None
+        data['aadhar_file'] = profile.aadhar_file.url if profile.aadhar_file else None
+        data['passport_file'] = profile.passport_file.url if profile.passport_file else None
+        data['city'] = address.city
+        data['state'] = address.state
+        data['country'] = address.country.name
+        data['pincode'] = address.pincode
+        data['address'] = address.address
+        data['membership_code'] = profile.membership_code
+        payment = Payment.objects.filter(user=instance).first()
+        data['amount'] = payment.amount
+        data['tax'] = payment.tax
+        return data
+
+
 class StateSerializer(serializers.ModelSerializer):
     class Meta:
         model = State
@@ -333,5 +362,104 @@ class CCAvenueRequestSerializer(serializers.Serializer):
     currency = serializers.CharField(max_length=3)
     redirect_url = serializers.URLField()
     cancel_url = serializers.URLField()
+
+
+class RegisterOffsiteUser(serializers.ModelSerializer):
+    email = serializers.EmailField(required=True)
+    mobile_number = serializers.CharField(required=True)
+    title = serializers.CharField(required=True, error_messages={'required': 'Title is required'})
+    first_name = serializers.CharField(required=True,
+                                       error_messages={'required': 'First Name is required'})
+    last_name = serializers.CharField(required=True,
+                                      error_messages={'required': 'Last Name is required'})
+
+    gender = serializers.CharField(required=True,
+                                   error_messages={'required': 'Gender is required'})
+    organization = serializers.CharField(required=True,
+                                         error_messages={'required': 'Organization Name is required'})
+    designation = serializers.CharField(required=True,
+                                        error_messages={'required': 'Designation is required'})
+
+    gst_number = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    gst_file = CustomBase64FileField(required=False)
+    aadhar_number = serializers.CharField(required=False)
+
+    aadhar_file = CustomBase64FileField(required=False)
+    passport_number = serializers.CharField(required=False)
+    passport_file = CustomBase64FileField(required=False)
+    city = serializers.CharField(required=False)
+    state = serializers.CharField(required=False)
+    country = serializers.PrimaryKeyRelatedField(queryset=Country.objects.all(), required=True,
+                                                 error_messages={'required': 'Country is required'})
+    pincode = serializers.CharField(required=False)
+    address = serializers.CharField(required=False)
+    business_number = serializers.CharField(required=False)
+    direct_number = serializers.CharField(required=False)
+
+    primary_address = serializers.CharField(required=False)
+    primary_state = serializers.CharField(required=False)
+    primary_city = serializers.CharField(required=False)
+    primary_pincode = serializers.CharField(required=False)
+    is_default_address = serializers.BooleanField(required=False)
+    amount = serializers.DecimalField(max_digits=10, decimal_places=2, required=True)
+    tax = serializers.DecimalField(max_digits=10, decimal_places=2, required=True)
+    membership_code = serializers.CharField(required=False)
+
+    class Meta:
+        model = UserProfile
+        fields = ('title', 'first_name', 'last_name', 'mobile_number', 'gender', 'organization', 'designation',
+                  'gst_number', 'gst_file', 'aadhar_number', 'aadhar_file', 'passport_number', 'passport_file',
+                  'city', 'state', 'country', 'pincode', 'business_number', 'direct_number', 'primary_address',
+                  'primary_state', 'primary_city', 'primary_pincode', 'is_default_address', 'address', 'amount',
+                  'tax','membership_code', 'email')
+
+    def create(self, validated_data):
+        # import pdb;pdb.set_trace()
+        validated_data['organization_name'] = validated_data.pop('organization')
+        user = User.objects.create(
+            title = validated_data['title'],
+            email=validated_data['email'],
+            mobile_number=validated_data['mobile_number'],
+            first_name=validated_data['first_name'],
+            last_name=validated_data['last_name'],
+            designation=validated_data['designation'],
+            organization_name=validated_data['organization_name'],
+            gender=validated_data['gender'],
+            user_type='Client',
+            is_active=True)
+
+        profile = UserProfile.objects.create(
+            user=user,
+            gst_number=validated_data.pop('gst_number', None),
+            gst_file=validated_data.pop('gst_file', None),
+            aadhar_number=validated_data.pop('aadhar_number', None),
+            aadhar_file=validated_data.pop('aadhar_file', None),
+            passport_number=validated_data.pop('passport_number', None),
+            passport_file=validated_data.pop('passport_file', None),
+            business_number=validated_data.pop('business_number', None),
+            direct_number=validated_data.pop('direct_number', None),
+        )
+
+        country = validated_data.pop('country', None)
+        address_data = dict(
+            user=user,
+            city=validated_data.pop('city'),
+            state=validated_data.pop('state'),
+            country=country,
+            pincode=validated_data.pop('pincode'),
+            address_type='Billing',
+            address=validated_data.pop('address'),
+            is_default=validated_data.pop('is_default_address', False),
+        )
+
+        address = Address.objects.create(**address_data)
+        payment = Payment.objects.create(amount=validated_data.get('amount'),
+                                         tax=validated_data.get('tax'),
+                                         user=user)
+
+        return user
+
+
+
 
 

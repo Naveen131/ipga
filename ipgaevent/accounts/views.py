@@ -9,7 +9,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from accounts.models import User, State, City, Country, Membership, Address, Payment
 from accounts.serializers import SignUpSerializer, LoginSerializer, UserProfileSerializer, StateSerializer, \
-    CitySerializer, CountrySerializer, PaymentTransferSerializer, GetProfileSerializer, DetailsUpdateSerializer
+    CitySerializer, CountrySerializer, PaymentTransferSerializer, GetProfileSerializer, DetailsUpdateSerializer, \
+    RegisterOffsiteUser, GetOffsiteUserSerializer
 from ipgaevent import settings
 from ipgaevent.settings import ZOHO_API_KEY
 from utils.utils import APIResponse
@@ -560,3 +561,50 @@ def download_user_report(request):
     )
     response['Content-Disposition'] = 'attachment; filename="user_report.xlsx"'
     return response
+
+
+class RegisterOffsiteView(CreateAPIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
+        serializer = RegisterOffsiteUser(data=request.data)
+        try:
+            if serializer.is_valid():
+                instance = serializer.create(serializer.validated_data)
+                data = GetOffsiteUserSerializer(instance).data
+                return APIResponse(data=data, status_code=200, message="User registered successfully")
+            else:
+                return APIResponse(data=None, status_code=400, message=serializer.errors)
+        except Exception as e:
+            return APIResponse(data=None, status_code=400, message=str(e))
+
+
+class OffsiteUserMembership(CreateAPIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        data = request.data
+        code = data.get('code')
+
+        try:
+            membership = Membership.objects.filter(code=code)
+            if membership.exists():
+               data = {
+                    'is_membership': True,
+                   'amount':2000,
+                   'tax':360,
+                }
+               return APIResponse(data=data, status_code=200, message="Membership code applied successfully")
+            else:
+                data = {
+                    'is_membership': False,
+                    'amount':3000,
+                    'tax':540,
+                }
+                return APIResponse(data=data, status_code=200, message="No Membership code applied")
+
+        except Exception as e:
+            return APIResponse(data=data, status_code=400, message=str(e))
+
+
