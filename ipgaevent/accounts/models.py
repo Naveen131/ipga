@@ -246,7 +246,7 @@ class User(AbstractUser, PermissionsMixin):
     organization_name = models.CharField(max_length=255, null=True, blank=True)
     nationality = models.ForeignKey(Nationality, on_delete=models.CASCADE, null=True, blank=True)
     reg_id = models.CharField(max_length=255, null=True, blank=True)
-    role = models.CharField(max_length=255, choices=ROLE_TYPE, null=True, blank=True)
+    role_type = models.CharField(max_length=255, choices=ROLE_TYPE, null=True, blank=True)
     # password = models.CharField(max_length=255)
     objects = CustomUserManager()
 
