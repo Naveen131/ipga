@@ -8,11 +8,11 @@ class Migration(migrations.Migration):
     dependencies = [
         ('accounts', '0017_alter_user_user_type'),
     ]
-
-    operations = [
-        migrations.AlterField(
-            model_name='user',
-            name='password',
-            field=models.CharField(max_length=128, verbose_name='password'),
-        ),
-    ]
+    #
+    # operations = [
+    #     migrations.AlterField(
+    #         model_name='user',
+    #         name='password',
+    #         field=models.CharField(max_length=128, verbose_name='password'),
+    #     ),
+    # ]
