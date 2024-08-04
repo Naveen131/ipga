@@ -53,7 +53,7 @@ class LoginAPIView(CreateAPIView):
         data = {
             'refresh': str(refresh),
             'access': str(refresh.access_token),
-            'role': user.role if user.role else None,
+            'role': user.role_type if user.role_type else None,
         }
 
         return APIResponse(data=data, status_code=200, message="Login successful")
