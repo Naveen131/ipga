@@ -559,7 +559,7 @@ def generate_xls_report():
         ws.row_dimensions[ws.max_row].height = row_height
 
         # Generate the URL to be embedded in the barcode
-        user_url = f'https://yourdomain.com/user/{user.id}'
+        user_url = f'{user.reg_id}'
 
         # Generate the barcode image for the user URL
         barcode_file_path = f'barcode_{user.id}'  # Do not add extension here
