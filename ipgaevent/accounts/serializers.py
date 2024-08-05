@@ -365,20 +365,15 @@ class CCAvenueRequestSerializer(serializers.Serializer):
 
 
 class RegisterOffsiteUser(serializers.ModelSerializer):
-    email = serializers.EmailField(required=True)
-    mobile_number = serializers.CharField(required=True)
-    title = serializers.CharField(required=True, error_messages={'required': 'Title is required'})
-    first_name = serializers.CharField(required=True,
-                                       error_messages={'required': 'First Name is required'})
-    last_name = serializers.CharField(required=True,
-                                      error_messages={'required': 'Last Name is required'})
+    email = serializers.EmailField(required=False)
+    mobile_number = serializers.CharField(required=False)
+    title = serializers.CharField(required=False)
+    first_name = serializers.CharField(required=False)
+    last_name = serializers.CharField(required=False)
 
-    gender = serializers.CharField(required=True,
-                                   error_messages={'required': 'Gender is required'})
-    organization = serializers.CharField(required=True,
-                                         error_messages={'required': 'Organization Name is required'})
-    designation = serializers.CharField(required=True,
-                                        error_messages={'required': 'Designation is required'})
+    gender = serializers.CharField(required=False)
+    organization = serializers.CharField(required=False)
+    designation = serializers.CharField(required=False)
 
     gst_number = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     gst_file = CustomBase64FileField(required=False)
