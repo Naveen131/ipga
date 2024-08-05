@@ -7,7 +7,7 @@ from rest_framework.generics import CreateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from accounts.models import User, State, City, Country, Membership, Address, Payment
+from accounts.models import User, State, City, Country, Membership, Address, Payment, UserProfile
 from accounts.serializers import SignUpSerializer, LoginSerializer, UserProfileSerializer, StateSerializer, \
     CitySerializer, CountrySerializer, PaymentTransferSerializer, GetProfileSerializer, DetailsUpdateSerializer, \
     RegisterOffsiteUser, GetOffsiteUserSerializer
@@ -472,11 +472,19 @@ class PaymentTransferAPIView(CreateAPIView):
             return APIResponse(data=None, status_code=400, message=serializer.errors)
 
 
-
-
 import openpyxl
+from openpyxl.drawing.image import Image
+import barcode
+from barcode.writer import ImageWriter
+from io import BytesIO
 from django.http import HttpResponse
-from .models import User, UserProfile, Address
+
+
+def generate_barcode(data, file_path):
+    EAN = barcode.get_barcode_class('code128')
+    ean = EAN(data, writer=ImageWriter())
+    ean.save(file_path)
+
 
 def generate_xls_report():
     wb = openpyxl.Workbook()
@@ -489,9 +497,17 @@ def generate_xls_report():
         'Business Number', 'Direct Number', 'Address', 'City', 'State', 'Pincode', 'Country',
         'Membership Code', 'Aadhar File', 'Gst File', 'PassPort File', 'Registration Category',
         'Payment Status', 'Payment Reference', 'Payment Date', 'Payment Amount', 'Payment Tax', 'Payment Total',
-
+        'Barcode'
     ]
     ws.append(headers)
+
+    # Set the width of the column for barcode images (column AD in this example)
+    barcode_column_index = len(headers)  # Calculate the last column index
+    barcode_column_letter = openpyxl.utils.get_column_letter(barcode_column_index)
+    ws.column_dimensions[barcode_column_letter].width = 25  # Adjust the width as needed
+
+    # Define the height for the rows
+    row_height = 60  # Adjust the height as needed
 
     users = User.objects.all().order_by('id')
     for user in users:
@@ -513,46 +529,57 @@ def generate_xls_report():
             payment_date = payment.payment_date.date() if payment.payment_date else ""
             payment_amount = payment.amount
             payment_total = payment.amount + payment.tax
-        aadhar_file = None
-        gst_file = None
-        passport_file = None
-        if user_profile:
-            aadhar_file = user_profile.aadhar_file.url if user_profile.aadhar_file else ''
-            gst_file = user_profile.gst_file.url if user_profile.gst_file else ''
-            passport_file = user_profile.passport_file.url if user_profile.passport_file else ''
-        addresses = Address.objects.filter(user=user)
-        address = None
-        if addresses.exists():
-            address = addresses.first()
 
+        aadhar_file = user_profile.aadhar_file.url if user_profile and user_profile.aadhar_file else ''
+        gst_file = user_profile.gst_file.url if user_profile and user_profile.gst_file else ''
+        passport_file = user_profile.passport_file.url if user_profile and user_profile.passport_file else ''
+
+        addresses = Address.objects.filter(user=user)
+        address = addresses.first() if addresses.exists() else None
 
         row = [
             user.title, date_joined, user.first_name, user.last_name, user.email, user.mobile_number,
-            user.designation, user.gender,
-            user.organization_name,
-            user.reg_id,
+            user.designation, user.gender, user.organization_name, user.reg_id,
             user_profile.gst_number if user_profile else '',
-            user_profile.passport_number if user_profile else '', user_profile.aadhar_number if user_profile else '',
-            user_profile.business_number if user_profile else '', user_profile.direct_number if user_profile else '',
+            user_profile.passport_number if user_profile else '',
+            user_profile.aadhar_number if user_profile else '',
+            user_profile.business_number if user_profile else '',
+            user_profile.direct_number if user_profile else '',
             address.address if address else '', address.city if address else '', address.state if address else '',
             address.pincode if address else '', address.country.name if address else '',
             user_profile.membership_code if user_profile else '',
             aadhar_file, gst_file, passport_file,
-            "Delegate" if user.user_type =='Internal' else user.user_type,
-            payment_status, payment_ref,
-            payment_date, payment_amount, payment_tax, payment_total
-
-
-
-
+            "Delegate" if user.user_type == 'Internal' else user.user_type,
+            payment_status, payment_ref, payment_date, payment_amount, payment_tax, payment_total,
+            ''  # Placeholder for the barcode image column
         ]
         ws.append(row)
 
-    from io import BytesIO
+        # Set the height for the row containing the barcode image
+        ws.row_dimensions[ws.max_row].height = row_height
+
+        # Generate the URL to be embedded in the barcode
+        user_url = f'https://yourdomain.com/user/{user.id}'
+
+        # Generate the barcode image for the user URL
+        barcode_file_path = f'barcode_{user.id}'  # Do not add extension here
+        generate_barcode(user_url, barcode_file_path)
+        barcode_image_path = f'{barcode_file_path}.png'
+        img = Image(barcode_image_path)
+
+        # Resize the image
+        img.width = 150  # Set the width to desired value
+        img.height = 50  # Set the height to desired value
+
+        # Correctly place the barcode image in the last column
+        img.anchor = f'{barcode_column_letter}{ws.max_row}'  # Adjust the column and row as necessary
+        ws.add_image(img)
+
     output = BytesIO()
     wb.save(output)
     output.seek(0)
     return output
+
 
 def download_user_report(request):
     output = generate_xls_report()
