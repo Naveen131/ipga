@@ -609,7 +609,7 @@ class RegisterOffsiteView(CreateAPIView):
             else:
                 instance = serializer.create(serializer.validated_data)
                 data = GetOffsiteUserSerializer(instance).data
-                return APIResponse(data=data, status_code=400, message="User registered successfully")
+                return APIResponse(data=data, status_code=200, message="User registered successfully")
         except Exception as e:
             return APIResponse(data=None, status_code=400, message=str(e))
 
