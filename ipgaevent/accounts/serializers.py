@@ -373,7 +373,7 @@ class RegisterOffsiteUser(serializers.ModelSerializer):
 
     gender = serializers.CharField(required=False)
     organization = serializers.CharField(required=False)
-    designation = serializers.CharField(required=False)
+    designation = serializers.CharField(required=False, allow_null=True, allow_blank=True)
 
     gst_number = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     gst_file = CustomBase64FileField(required=False)
@@ -386,7 +386,7 @@ class RegisterOffsiteUser(serializers.ModelSerializer):
     state = serializers.CharField(required=False)
     country = serializers.PrimaryKeyRelatedField(queryset=Country.objects.all(), required=True,
                                                  error_messages={'required': 'Country is required'})
-    pincode = serializers.CharField(required=False)
+    pincode = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     address = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     business_number = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     direct_number = serializers.CharField(required=False, allow_null=True, allow_blank=True)
