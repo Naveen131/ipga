@@ -377,19 +377,19 @@ class RegisterOffsiteUser(serializers.ModelSerializer):
 
     gst_number = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     gst_file = CustomBase64FileField(required=False)
-    aadhar_number = serializers.CharField(required=False)
+    aadhar_number = serializers.CharField(required=False, allow_null=True, allow_blank=True)
 
     aadhar_file = CustomBase64FileField(required=False)
-    passport_number = serializers.CharField(required=False)
+    passport_number = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     passport_file = CustomBase64FileField(required=False)
     city = serializers.CharField(required=False)
     state = serializers.CharField(required=False)
     country = serializers.PrimaryKeyRelatedField(queryset=Country.objects.all(), required=True,
                                                  error_messages={'required': 'Country is required'})
     pincode = serializers.CharField(required=False)
-    address = serializers.CharField(required=False)
-    business_number = serializers.CharField(required=False)
-    direct_number = serializers.CharField(required=False)
+    address = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    business_number = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    direct_number = serializers.CharField(required=False, allow_null=True, allow_blank=True)
 
     primary_address = serializers.CharField(required=False)
     primary_state = serializers.CharField(required=False)
@@ -398,7 +398,7 @@ class RegisterOffsiteUser(serializers.ModelSerializer):
     is_default_address = serializers.BooleanField(required=False)
     amount = serializers.DecimalField(max_digits=10, decimal_places=2, required=True)
     tax = serializers.DecimalField(max_digits=10, decimal_places=2, required=True)
-    membership_code = serializers.CharField(required=False)
+    membership_code = serializers.CharField(required=False,allow_null=True, allow_blank=True)
 
     class Meta:
         model = UserProfile
