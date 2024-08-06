@@ -603,9 +603,7 @@ class RegisterOffsiteView(CreateAPIView):
                     errors.append(messages[0] if type(messages) == list else messages)
 
                 return APIResponse(data=None, status_code=400,
-                                   message=errors[0].__str__() if type(
-                                       errors[0]) == 'rest_framework.exceptions.ErrorDetail'
-                                   else errors[0])
+                                   message=serializer.errors)
             else:
                 instance = serializer.create(serializer.validated_data)
                 data = GetOffsiteUserSerializer(instance).data
