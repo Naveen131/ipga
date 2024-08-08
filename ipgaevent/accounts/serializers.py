@@ -295,7 +295,7 @@ class GetOffsiteUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('title', 'first_name', 'last_name', 'mobile_number', 'email',
-                  'organization_name', 'designation', 'gender')
+                  'organization_name', 'designation', 'gender','reg_id')
     def to_representation(self, instance):
         data = super().to_representation(instance)
         profile = UserProfile.objects.filter(user=instance).first()
