@@ -295,11 +295,12 @@ class GetOffsiteUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('title', 'first_name', 'last_name', 'mobile_number', 'email',
-                  'organization_name', 'designation', 'gender','reg_id')
+                  'organization_name', 'designation', 'gender')
     def to_representation(self, instance):
         data = super().to_representation(instance)
         profile = UserProfile.objects.filter(user=instance).first()
         address = Address.objects.filter(user=instance).first()
+        data['reg_id'] = instance.reg_id[7]
         data['organization'] = data.pop('organization_name')
         data['gst_number'] = profile.gst_number
         data['aadhar_number'] = profile.aadhar_number
