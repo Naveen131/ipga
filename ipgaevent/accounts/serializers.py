@@ -451,6 +451,8 @@ class RegisterOffsiteUser(serializers.ModelSerializer):
         payment = Payment.objects.create(amount=validated_data.get('amount'),
                                          tax=validated_data.get('tax'),
                                          user=user)
+        user.reg_id = f"BDS2024{user.id}"
+        user.save()
 
         return user
 
