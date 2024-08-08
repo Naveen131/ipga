@@ -300,7 +300,7 @@ class GetOffsiteUserSerializer(serializers.ModelSerializer):
         data = super().to_representation(instance)
         profile = UserProfile.objects.filter(user=instance).first()
         address = Address.objects.filter(user=instance).first()
-        data['reg_id'] = instance.reg_id[6:]
+        data['reg_id'] = instance.reg_id[7:]
         data['organization'] = data.pop('organization_name')
         data['gst_number'] = profile.gst_number
         data['aadhar_number'] = profile.aadhar_number
