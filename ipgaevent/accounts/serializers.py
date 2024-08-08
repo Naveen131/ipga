@@ -367,12 +367,12 @@ class CCAvenueRequestSerializer(serializers.Serializer):
 class RegisterOffsiteUser(serializers.ModelSerializer):
     email = serializers.EmailField(required=False)
     mobile_number = serializers.CharField(required=False)
-    title = serializers.CharField(required=False)
-    first_name = serializers.CharField(required=False)
-    last_name = serializers.CharField(required=False)
+    title = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    first_name = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    last_name = serializers.CharField(required=False, allow_null=True, allow_blank=True)
 
-    gender = serializers.CharField(required=False)
-    organization = serializers.CharField(required=False)
+    gender = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    organization = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     designation = serializers.CharField(required=False, allow_null=True, allow_blank=True)
 
     gst_number = serializers.CharField(required=False, allow_null=True, allow_blank=True)
