@@ -247,6 +247,8 @@ class User(AbstractUser, PermissionsMixin):
     nationality = models.ForeignKey(Nationality, on_delete=models.CASCADE, null=True, blank=True)
     reg_id = models.CharField(max_length=255, null=True, blank=True)
     role_type = models.CharField(max_length=255, choices=ROLE_TYPE, null=True, blank=True)
+    is_batch_printed = models.BooleanField(default=False)
+    is_kit_collected = models.BooleanField(default=False)
     # password = models.CharField(max_length=255)
     objects = CustomUserManager()
 

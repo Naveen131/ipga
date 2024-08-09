@@ -188,7 +188,7 @@ class Base64OrURLFileField(serializers.FileField):
         raise serializers.ValidationError('Invalid file data.')
 
 class DetailsUpdateSerializer(serializers.ModelSerializer):
-    title = serializers.CharField(required=False)
+    title = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     first_name = serializers.CharField(required=False)
     last_name = serializers.CharField(required=False)
     mobile_number = serializers.CharField(required=False)
@@ -453,6 +453,7 @@ class RegisterOffsiteUser(serializers.ModelSerializer):
                                          tax=validated_data.get('tax'),
                                          user=user)
         user.reg_id = f"BDS2024{user.id}"
+        user.is_batch_printed = True
         user.save()
 
         return user
