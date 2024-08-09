@@ -9,7 +9,8 @@ class UserCreationForm(forms.ModelForm):
         model = User
         fields = ('email', 'mobile_number',
                   'password','title', 'first_name', 'gender','user_type',
-                  'last_name', 'designation', 'reg_id', 'organization_name','role_type')
+                  'last_name', 'designation', 'reg_id', 'organization_name',
+                  'role_type','is_active','is_batch_printed','is_kit_collected')
 
     def save(self, commit=True):
         user = super(UserCreationForm,self).save(commit=False)
